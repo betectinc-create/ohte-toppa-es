@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, Sparkles, Crown, Users, CheckCircle, Copy, X, FileText, Target, Award, Building2, Star, Edit2, Plus, Trash2 } from 'lucide-react';
+import { Shield, Sparkles, Crown, Users, CheckCircle, Copy, X, FileText, Target, Award, Building2, Star, Edit2, Plus, Trash2, Sun, Moon } from 'lucide-react';
 
 type GenerationType = 'es' | 'motivation' | 'gakuchika';
 type SelectionType = 'job' | 'intern';
+type Theme = 'dark' | 'light';
 
 interface Company {
   name: string;
@@ -81,6 +82,7 @@ const COMPANY_LIST: Company[] = [
 ];
 
 export default function HomePage() {
+  const [theme, setTheme] = useState<Theme>('dark');
   const [credits, setCredits] = useState(5);
   const [generationType, setGenerationType] = useState<GenerationType>('es');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -93,6 +95,7 @@ export default function HomePage() {
   const [showValuesEdit, setShowValuesEdit] = useState(false);
   const [customValues, setCustomValues] = useState<string[]>([]);
   const [newValue, setNewValue] = useState('');
+  const [useOptimization, setUseOptimization] = useState(true); // 企業データ最適化ON/OFF
   
   const [formData, setFormData] = useState({
     selectionType: 'job' as SelectionType,
@@ -103,6 +106,43 @@ export default function HomePage() {
 
   const wordCounts = Array.from({ length: 15 }, (_, i) => 100 + i * 50);
 
+  // テーマの色設定
+  const colors = theme === 'dark' ? {
+    bg: 'linear-gradient(135deg, #0a1f15 0%, #0d2b1e 50%, #0f3626 100%)',
+    headerBg: 'linear-gradient(to bottom, rgba(5, 20, 15, 0.98), rgba(10, 30, 20, 0.95))',
+    cardBg: 'linear-gradient(135deg, rgba(15, 50, 35, 0.8) 0%, rgba(10, 40, 30, 0.7) 100%)',
+    inputBg: 'bg-slate-900/80',
+    textPrimary: 'text-white',
+    textSecondary: 'text-gray-200',
+    textTertiary: 'text-emerald-300',
+    border: 'rgba(16, 185, 129, 0.4)',
+  } : {
+    bg: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%)',
+    headerBg: 'linear-gradient(to bottom, rgba(240, 253, 244, 0.98), rgba(220, 252, 231, 0.95))',
+    cardBg: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 244, 0.9) 100%)',
+    inputBg: 'bg-white',
+    textPrimary: 'text-gray-900',
+    textSecondary: 'text-gray-700',
+    textTertiary: 'text-emerald-700',
+    border: 'rgba(16, 185, 129, 0.3)',
+  };
+
+  // 生成タイプが変わったときにデフォルトの設問を設定
+  const handleGenerationTypeChange = (type: GenerationType) => {
+    setGenerationType(type);
+    
+    let defaultQuestion = '';
+    if (type === 'motivation') {
+      defaultQuestion = 'なぜ当社を志望しますか？';
+    } else if (type === 'gakuchika') {
+      defaultQuestion = '学生時代に最も力を入れたことを教えてください';
+    } else {
+      defaultQuestion = '';
+    }
+    
+    setFormData({...formData, question: defaultQuestion});
+  };
+
   const filteredCompanies = companyInput.length > 0
     ? COMPANY_LIST.filter(c => c.name.includes(companyInput))
     : [];
@@ -112,6 +152,7 @@ export default function HomePage() {
     setSelectedCompany(company);
     setShowSuggestions(false);
     setCustomValues(company.values || []);
+    setUseOptimization(true); // 企業選択時は最適化ON
   };
 
   const handleCompanyInputChange = (value: string) => {
@@ -122,8 +163,12 @@ export default function HomePage() {
     setSelectedCompany(exactMatch || null);
     if (exactMatch) {
       setCustomValues(exactMatch.values || []);
+      setUseOptimization(true); // 企業選択時は最適化ON
     } else {
       setCustomValues([]);
+      if (value) {
+        setUseOptimization(true); // 新しい企業入力時も最適化ON
+      }
     }
   };
 
@@ -159,7 +204,7 @@ export default function HomePage() {
         },
         body: JSON.stringify({
           company: companyInput,
-          values: customValues,
+          values: useOptimization ? customValues : [], // 最適化OFFの時は空配列
           question: formData.question,
           episode: formData.episode,
           wordCount: formData.wordCount,
@@ -190,11 +235,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen" style={{
-      background: 'linear-gradient(135deg, #0a2e1a 0%, #1a4d2e 50%, #2d6a4f 100%)'
+    <div className="min-h-screen transition-all duration-300" style={{
+      background: colors.bg
     }}>
-      <header className="border-b border-emerald-700/30" style={{
-        background: 'linear-gradient(to bottom, rgba(10, 46, 26, 0.95), rgba(26, 77, 46, 0.8))',
+      <header className={`border-b transition-all duration-300 ${theme === 'dark' ? 'border-emerald-500/20' : 'border-emerald-300/30'}`} style={{
+        background: colors.headerBg,
         backdropFilter: 'blur(20px)'
       }}>
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
@@ -203,34 +248,58 @@ export default function HomePage() {
               <Shield className="w-10 h-10 md:w-12 md:h-12 text-emerald-400" strokeWidth={1.5} />
               <div>
                 <h1 className="text-xl md:text-3xl font-bold" style={{
-                  background: 'linear-gradient(135deg, #d4f1d4 0%, #a7f3d0 50%, #86efac 100%)',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}>
                   大手突破ES
                 </h1>
-                <p className="text-emerald-200 text-xs md:text-sm opacity-80">
+                <p className={`text-xs md:text-sm opacity-80 ${colors.textTertiary}`}>
                   AIで、大手の壁を突破する
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <div className="text-emerald-100 text-sm">無料プラン</div>
-                <div className="text-emerald-300 font-bold">残り {credits} 回</div>
-              </div>
+            <div className="flex items-center gap-3 md:gap-4 flex-wrap">
+              {/* テーマ切り替えボタン */}
               <button
-                onClick={() => alert('プレミアムプランは準備中です')}
-                className="px-4 md:px-6 py-2.5 rounded-full font-semibold text-sm transition-all hover:scale-105"
-                style={{
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  boxShadow: '0 4px 16px rgba(16, 185, 129, 0.3)',
-                  color: 'white'
-                }}
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className={`p-2 rounded-lg transition-all hover:scale-110 ${theme === 'dark' ? 'bg-slate-800 text-amber-400' : 'bg-white text-indigo-600'}`}
+                title={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
               >
-                プレミアムへ
+                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
+
+              <div className="text-right">
+                <div className={`text-sm ${colors.textSecondary}`}>無料プラン</div>
+                <div className="text-emerald-500 font-bold">残り {credits} 回</div>
+              </div>
+
+              {/* プレミアムエリア - 横並び */}
+              <div className="flex items-center gap-2 px-3 py-2 rounded-full" style={{
+                background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%)',
+                border: '1px solid rgba(251, 191, 36, 0.3)',
+              }}>
+                <span className="text-xs font-bold whitespace-nowrap" style={{
+                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                  ✨ 生成無制限・内定率UP
+                </span>
+                
+                <button
+                  onClick={() => alert('プレミアムプランは準備中です')}
+                  className="px-4 py-2 rounded-full font-semibold text-xs transition-all hover:scale-105 whitespace-nowrap"
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    boxShadow: '0 2px 12px rgba(16, 185, 129, 0.3)',
+                    color: 'white'
+                  }}
+                >
+                  プレミアムへ
+                </button>
+              </div>
             </div>
           </div>
 
@@ -252,12 +321,12 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             {/* 生成タイプ選択 */}
-            <div className="rounded-2xl p-6 border" style={{
-              background: 'linear-gradient(135deg, rgba(6, 78, 59, 0.6) 0%, rgba(4, 120, 87, 0.4) 100%)',
+            <div className={`rounded-2xl p-6 border transition-all duration-300`} style={{
+              background: colors.cardBg,
               backdropFilter: 'blur(20px)',
-              borderColor: 'rgba(16, 185, 129, 0.3)',
+              borderColor: colors.border,
             }}>
-              <h2 className="text-xl font-bold text-emerald-50 mb-4">何を作りますか？</h2>
+              <h2 className={`text-xl font-bold mb-4 ${colors.textPrimary}`}>何を作りますか？</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {[
                   { type: 'es' as GenerationType, icon: FileText, label: 'ES生成' },
@@ -266,39 +335,39 @@ export default function HomePage() {
                 ].map(({ type, icon: Icon, label }) => (
                   <button
                     key={type}
-                    onClick={() => setGenerationType(type)}
+                    onClick={() => handleGenerationTypeChange(type)}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      generationType === type ? 'border-emerald-400' : 'border-emerald-700/30'
+                      generationType === type ? 'border-emerald-400' : `${theme === 'dark' ? 'border-emerald-700/30' : 'border-emerald-300/40'}`
                     }`}
                     style={{
                       background: generationType === type 
                         ? 'rgba(16, 185, 129, 0.2)' 
-                        : 'rgba(6, 78, 59, 0.3)'
+                        : theme === 'dark' ? 'rgba(6, 78, 59, 0.3)' : 'rgba(220, 252, 231, 0.5)'
                     }}
                   >
-                    <Icon className="w-6 h-6 text-emerald-300 mx-auto mb-2" />
-                    <div className="text-emerald-50 font-semibold">{label}</div>
+                    <Icon className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
+                    <div className={`font-semibold ${colors.textPrimary}`}>{label}</div>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* 入力フォーム */}
-            <div className="rounded-2xl p-6 md:p-8 border" style={{
-              background: 'linear-gradient(135deg, rgba(6, 78, 59, 0.6) 0%, rgba(4, 120, 87, 0.4) 100%)',
+            <div className={`rounded-2xl p-6 md:p-8 border transition-all duration-300`} style={{
+              background: colors.cardBg,
               backdropFilter: 'blur(20px)',
-              borderColor: 'rgba(16, 185, 129, 0.3)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+              borderColor: colors.border,
+              boxShadow: theme === 'dark' ? '0 8px 32px rgba(0, 0, 0, 0.5)' : '0 8px 32px rgba(0, 0, 0, 0.1)'
             }}>
               <div className="flex items-center gap-3 mb-2">
-                <Building2 className="w-6 h-6 text-emerald-300" />
-                <h2 className="text-2xl font-bold text-emerald-50">
+                <Building2 className="w-6 h-6 text-emerald-400" />
+                <h2 className={`text-2xl font-bold ${colors.textPrimary}`}>
                   {companyInput ? `${companyInput}用${generationType === 'es' ? 'ES' : generationType === 'motivation' ? '志望動機' : 'ガクチカ'}作成` : 'どの企業のESを作りますか？'}
                 </h2>
               </div>
               
               {companyInput && (
-                <p className="text-emerald-200 text-sm mb-6">
+                <p className={`text-sm mb-6 ${colors.textTertiary}`}>
                   ✨ {companyInput}に最適化したESを生成します
                 </p>
               )}
@@ -306,7 +375,7 @@ export default function HomePage() {
               <div className="space-y-5">
                 {/* 企業名 */}
                 <div>
-                  <label className="block text-sm font-medium text-emerald-100 mb-2">
+                  <label className={`block text-sm font-medium mb-2 ${colors.textSecondary}`}>
                     企業名 <span className="text-emerald-400">*</span>
                   </label>
                   <div className="relative">
@@ -315,28 +384,30 @@ export default function HomePage() {
                       value={companyInput}
                       onChange={(e) => handleCompanyInputChange(e.target.value)}
                       onFocus={() => setShowSuggestions(companyInput.length > 0)}
-                      className="w-full px-4 py-3 rounded-xl border bg-emerald-950/50 text-emerald-50 placeholder-emerald-400/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                      className={`w-full px-4 py-3 rounded-xl border ${colors.inputBg} ${colors.textPrimary} placeholder-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400`}
                       placeholder="企業名を検索・選択..."
-                      style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}
+                      style={{ borderColor: colors.border }}
                     />
                     
                     {showSuggestions && filteredCompanies.length > 0 && (
-                      <div className="absolute z-10 w-full mt-2 rounded-xl border bg-emerald-900 max-h-60 overflow-y-auto"
-                        style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}>
+                      <div className={`absolute z-10 w-full mt-2 rounded-xl border max-h-60 overflow-y-auto ${theme === 'dark' ? 'bg-emerald-900' : 'bg-white'}`}
+                        style={{ borderColor: colors.border }}>
                         {filteredCompanies.map((company) => (
                           <button
                             key={company.name}
                             onClick={() => handleCompanySelect(company)}
-                            className="w-full px-4 py-3 text-left hover:bg-emerald-800/50 transition-colors border-b border-emerald-700/30 last:border-b-0"
+                            className={`w-full px-4 py-3 text-left transition-colors border-b last:border-b-0 ${
+                              theme === 'dark' ? 'hover:bg-emerald-800/50 border-emerald-700/30' : 'hover:bg-emerald-50 border-emerald-200/30'
+                            }`}
                           >
                             <div className="flex items-center gap-2">
                               {company.hasData && <Star className="w-4 h-4 text-amber-400 flex-shrink-0" />}
                               <div className="flex-1">
-                                <div className="text-emerald-50 font-medium">{company.name}</div>
-                                <div className="text-emerald-300 text-xs">{company.industry}</div>
+                                <div className={`font-medium ${colors.textPrimary}`}>{company.name}</div>
+                                <div className={`text-xs ${colors.textTertiary}`}>{company.industry}</div>
                               </div>
                               {company.hasData && (
-                                <span className="text-xs text-emerald-300 bg-emerald-800/50 px-2 py-1 rounded">
+                                <span className={`text-xs px-2 py-1 rounded ${theme === 'dark' ? 'text-emerald-300 bg-emerald-800/50' : 'text-emerald-700 bg-emerald-100'}`}>
                                   データあり
                                 </span>
                               )}
@@ -347,127 +418,255 @@ export default function HomePage() {
                     )}
                   </div>
                   
-                  <div className="mt-2 flex items-center gap-2 text-xs text-emerald-300">
+                  <div className={`mt-2 flex items-center gap-2 text-xs ${colors.textTertiary}`}>
                     <Building2 className="w-4 h-4" />
                     <span>現在50社のデータあり • 企業は随時追加中！</span>
                   </div>
 
                   {/* 企業データ表示・編集 */}
                   {selectedCompany && selectedCompany.hasData && (
-                    <div className="mt-3 p-4 rounded-xl bg-emerald-900/30 border border-emerald-700/30">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <Star className="w-4 h-4 text-amber-400" />
-                          <span className="text-emerald-50 font-semibold">{selectedCompany.name}</span>
-                          <span className="text-xs text-emerald-300">企業データあり</span>
+                    <div 
+                      className="mt-3 p-5 rounded-xl border-2 relative transition-all duration-300"
+                      style={{
+                        background: theme === 'dark' 
+                          ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%)'
+                          : 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.08) 100%)',
+                        borderColor: '#10b981',
+                        boxShadow: '0 4px 20px rgba(16, 185, 129, 0.2)',
+                        opacity: useOptimization ? 1 : 0.6,
+                      }}
+                    >
+                      <div>
+                        <div className="flex items-center gap-3 mb-4">
+                          <Star className="w-6 h-6 text-amber-400" />
+                          <div>
+                            <span className={`font-bold text-lg ${colors.textPrimary}`}>{selectedCompany.name}</span>
+                            <span className="ml-2 text-xs text-emerald-400 bg-emerald-900/30 px-2 py-1 rounded">
+                              ⚡ 企業データあり
+                            </span>
+                          </div>
                         </div>
-                        <button
-                          onClick={() => setShowValuesEdit(!showValuesEdit)}
-                          className="text-emerald-300 hover:text-emerald-200 transition-colors"
+
+                        {/* チェックボックス */}
+                        <div 
+                          className="mb-4 p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02]"
+                          onClick={() => setUseOptimization(!useOptimization)}
+                          style={{
+                            background: theme === 'dark' ? 'rgba(6, 78, 59, 0.5)' : 'rgba(220, 252, 231, 0.7)',
+                            border: `2px solid ${useOptimization ? '#10b981' : 'rgba(156, 163, 175, 0.5)'}`,
+                            boxShadow: useOptimization ? '0 2px 12px rgba(16, 185, 129, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.1)',
+                          }}
                         >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="text-xs text-emerald-200">
-                          💡 求める人物像:
+                          <div className="flex items-start gap-3">
+                            <div className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center transition-all border-2 ${
+                              useOptimization 
+                                ? 'bg-emerald-500 border-emerald-500' 
+                                : 'bg-transparent border-gray-400'
+                            }`}>
+                              {useOptimization && <CheckCircle className="w-5 h-5 text-white" />}
+                            </div>
+                            <div className="flex-1">
+                              <div className={`font-semibold ${colors.textPrimary} text-sm mb-1 flex items-center gap-2`}>
+                                この企業の価値観に沿ってESを最適化する
+                                <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
+                                  クリックで切り替え
+                                </span>
+                              </div>
+                              <div className={`text-xs ${colors.textSecondary}`}>
+                                {useOptimization 
+                                  ? '✓ 企業が求める人物像を反映した内容で生成します' 
+                                  : '汎用的な内容で生成します（企業データは参考表示のみ）'}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                         
-                        {showValuesEdit ? (
-                          <div className="space-y-2">
-                            {customValues.map((value, index) => (
-                              <div key={index} className="flex items-center gap-2">
-                                <span className="flex-1 text-sm text-emerald-100 bg-emerald-800/30 px-3 py-1.5 rounded">
-                                  {value}
-                                </span>
-                                <button
-                                  onClick={() => removeValue(index)}
-                                  className="text-red-400 hover:text-red-300"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                            ))}
-                            
-                            <div className="flex gap-2">
-                              <input
-                                type="text"
-                                value={newValue}
-                                onChange={(e) => setNewValue(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && addCustomValue()}
-                                placeholder="追加する人物像..."
-                                className="flex-1 px-3 py-1.5 text-sm rounded bg-emerald-950/50 text-emerald-50 border border-emerald-700/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
-                              />
-                              <button
-                                onClick={addCustomValue}
-                                className="px-3 py-1.5 bg-emerald-700/50 hover:bg-emerald-700 rounded transition-colors"
-                              >
-                                <Plus className="w-4 h-4 text-emerald-100" />
-                              </button>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className={`text-sm font-semibold ${colors.textPrimary} ${!useOptimization && 'opacity-50'}`}>
+                              💡 求める人物像{!useOptimization && '（参考）'}:
                             </div>
-                            
                             <button
-                              onClick={() => setShowValuesEdit(false)}
-                              className="text-xs text-emerald-300 hover:text-emerald-200"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowValuesEdit(!showValuesEdit);
+                              }}
+                              className="text-emerald-400 hover:text-emerald-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-emerald-900/30 flex items-center gap-1"
+                              disabled={!useOptimization}
+                              style={{ opacity: useOptimization ? 1 : 0.5 }}
                             >
-                              完了
+                              <Edit2 className="w-4 h-4" />
+                              <span className="text-sm font-medium">編集</span>
                             </button>
                           </div>
-                        ) : (
-                          <div className="flex flex-wrap gap-2">
-                            {customValues.map((value, index) => (
-                              <span key={index} className="text-sm text-emerald-100 bg-emerald-800/30 px-3 py-1 rounded">
-                                {value}
-                              </span>
-                            ))}
+                          
+                          {showValuesEdit ? (
+                            <div className="space-y-2">
+                              {customValues.map((value, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                  <span className={`flex-1 text-sm px-3 py-2 rounded-lg font-medium ${
+                                    theme === 'dark' ? 'text-emerald-100 bg-emerald-800/40' : 'text-emerald-900 bg-emerald-100'
+                                  }`}>
+                                    {value}
+                                  </span>
+                                  <button
+                                    onClick={() => removeValue(index)}
+                                    className="text-red-400 hover:text-red-300 p-2"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              ))}
+                              
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  value={newValue}
+                                  onChange={(e) => setNewValue(e.target.value)}
+                                  onKeyPress={(e) => e.key === 'Enter' && addCustomValue()}
+                                  placeholder="追加する人物像..."
+                                  className={`flex-1 px-3 py-2 text-sm rounded-lg ${colors.inputBg} ${colors.textPrimary} border focus:outline-none focus:ring-2 focus:ring-emerald-400`}
+                                  style={{ borderColor: colors.border }}
+                                />
+                                <button
+                                  onClick={addCustomValue}
+                                  className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
+                                >
+                                  <Plus className="w-5 h-5 text-white" />
+                                </button>
+                              </div>
+                              
+                              <button
+                                onClick={() => setShowValuesEdit(false)}
+                                className="text-sm text-emerald-400 hover:text-emerald-300"
+                              >
+                                完了
+                              </button>
+                            </div>
+                          ) : (
+                            <div className={`flex flex-wrap gap-2 transition-all ${!useOptimization && 'opacity-50'}`}>
+                              {customValues.map((value, index) => (
+                                <span 
+                                  key={index} 
+                                  className={`text-sm px-4 py-2 rounded-full font-semibold ${
+                                    theme === 'dark' ? 'text-emerald-100 bg-emerald-700/50' : 'text-emerald-900 bg-emerald-200'
+                                  }`}
+                                  style={{
+                                    boxShadow: useOptimization ? '0 2px 10px rgba(16, 185, 129, 0.2)' : 'none'
+                                  }}
+                                >
+                                  ✓ {value}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {selectedCompany.commonQuestions && (
+                          <div className={`mt-4 text-sm p-4 rounded-lg transition-all ${!useOptimization && 'opacity-50'}`} style={{
+                            background: theme === 'dark' 
+                              ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.2) 100%)'
+                              : 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%)',
+                            border: `1px solid ${theme === 'dark' ? 'rgba(16, 185, 129, 0.4)' : 'rgba(16, 185, 129, 0.3)'}`,
+                            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.15)'
+                          }}>
+                            <span className={`font-bold ${theme === 'dark' ? 'text-emerald-200' : 'text-emerald-900'}`}>📝 よく出る設問:</span>{' '}
+                            <span className={theme === 'dark' ? 'text-emerald-100' : 'text-emerald-800'}>
+                              {selectedCompany.commonQuestions.join(' / ')}
+                            </span>
                           </div>
                         )}
                       </div>
-                      
-                      {selectedCompany.commonQuestions && (
-                        <div className="mt-3 text-xs text-emerald-200">
-                          📝 よく出る設問: {selectedCompany.commonQuestions.join(' / ')}
-                        </div>
-                      )}
                     </div>
                   )}
 
                   {companyInput && !selectedCompany && (
-                    <div className="mt-3 p-4 rounded-xl bg-emerald-900/30 border border-emerald-700/30">
+                    <div className={`mt-3 p-5 rounded-xl border-2 transition-all duration-300`} style={{
+                      background: theme === 'dark' 
+                        ? 'linear-gradient(135deg, rgba(15, 50, 35, 0.6) 0%, rgba(10, 40, 30, 0.5) 100%)'
+                        : 'linear-gradient(135deg, rgba(220, 252, 231, 0.7) 0%, rgba(187, 247, 208, 0.5) 100%)',
+                      borderColor: colors.border,
+                      opacity: useOptimization ? 1 : 0.6,
+                    }}>
+                      <div className="mb-4 flex items-center gap-2">
+                        <Building2 className="w-5 h-5 text-emerald-400" />
+                        <span className={`font-bold ${colors.textPrimary}`}>{companyInput}</span>
+                      </div>
+
+                      {/* チェックボックス */}
+                      <div 
+                        className="mb-4 p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02]"
+                        onClick={() => setUseOptimization(!useOptimization)}
+                        style={{
+                          background: theme === 'dark' ? 'rgba(6, 78, 59, 0.5)' : 'rgba(220, 252, 231, 0.7)',
+                          border: `2px solid ${useOptimization ? '#10b981' : 'rgba(156, 163, 175, 0.5)'}`,
+                          boxShadow: useOptimization ? '0 2px 12px rgba(16, 185, 129, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center transition-all border-2 ${
+                            useOptimization 
+                              ? 'bg-emerald-500 border-emerald-500' 
+                              : 'bg-transparent border-gray-400'
+                          }`}>
+                            {useOptimization && <CheckCircle className="w-5 h-5 text-white" />}
+                          </div>
+                          <div className="flex-1">
+                            <div className={`font-semibold ${colors.textPrimary} text-sm mb-1 flex items-center gap-2`}>
+                              入力した人物像に沿ってESを最適化する
+                              <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
+                                クリックで切り替え
+                              </span>
+                            </div>
+                            <div className={`text-xs ${colors.textSecondary}`}>
+                              {useOptimization 
+                                ? '✓ 下記の人物像を反映した内容で生成します' 
+                                : '汎用的な内容で生成します'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
-                        <div className="text-xs text-emerald-200">
-                          💡 求める人物像を入力（任意）:
+                        <div className={`text-sm font-medium ${colors.textSecondary} ${!useOptimization && 'opacity-50'}`}>
+                          💡 求める人物像を入力{!useOptimization && '（参考）'}:
                         </div>
                         
                         {customValues.map((value, index) => (
-                          <div key={index} className="flex items-center gap-2">
-                            <span className="flex-1 text-sm text-emerald-100 bg-emerald-800/30 px-3 py-1.5 rounded">
+                          <div key={index} className={`flex items-center gap-2 transition-all ${!useOptimization && 'opacity-50'}`}>
+                            <span className={`flex-1 text-sm px-3 py-2 rounded ${
+                              theme === 'dark' ? 'text-emerald-100 bg-emerald-800/30' : 'text-emerald-900 bg-emerald-100'
+                            }`}>
                               {value}
                             </span>
                             <button
                               onClick={() => removeValue(index)}
                               className="text-red-400 hover:text-red-300"
+                              disabled={!useOptimization}
+                              style={{ opacity: useOptimization ? 1 : 0.5 }}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         ))}
                         
-                        <div className="flex gap-2">
+                        <div className={`flex gap-2 ${!useOptimization && 'opacity-50'}`}>
                           <input
                             type="text"
                             value={newValue}
                             onChange={(e) => setNewValue(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && addCustomValue()}
                             placeholder="例: リーダーシップ、協調性..."
-                            className="flex-1 px-3 py-1.5 text-sm rounded bg-emerald-950/50 text-emerald-50 border border-emerald-700/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                            className={`flex-1 px-3 py-2 text-sm rounded-lg ${colors.inputBg} ${colors.textPrimary} border focus:outline-none focus:ring-2 focus:ring-emerald-400`}
+                            style={{ borderColor: colors.border }}
+                            disabled={!useOptimization}
                           />
                           <button
                             onClick={addCustomValue}
-                            className="px-3 py-1.5 bg-emerald-700/50 hover:bg-emerald-700 rounded transition-colors"
+                            className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={!useOptimization}
                           >
-                            <Plus className="w-4 h-4 text-emerald-100" />
+                            <Plus className="w-4 h-4 text-white" />
                           </button>
                         </div>
                       </div>
@@ -477,7 +676,7 @@ export default function HomePage() {
 
                 {/* 選考タイプ */}
                 <div>
-                  <label className="block text-sm font-medium text-emerald-100 mb-3">
+                  <label className={`block text-sm font-medium mb-3 ${colors.textSecondary}`}>
                     選考タイプ <span className="text-emerald-400">*</span>
                   </label>
                   <div className="grid grid-cols-2 gap-3">
@@ -489,15 +688,15 @@ export default function HomePage() {
                         key={value}
                         onClick={() => setFormData({...formData, selectionType: value})}
                         className={`p-3 rounded-xl border-2 transition-all ${
-                          formData.selectionType === value ? 'border-emerald-400' : 'border-emerald-700/30'
+                          formData.selectionType === value ? 'border-emerald-400' : `${theme === 'dark' ? 'border-emerald-700/30' : 'border-emerald-300/40'}`
                         }`}
                         style={{
                           background: formData.selectionType === value 
                             ? 'rgba(16, 185, 129, 0.2)' 
-                            : 'rgba(6, 78, 59, 0.3)'
+                            : theme === 'dark' ? 'rgba(6, 78, 59, 0.3)' : 'rgba(220, 252, 231, 0.3)'
                         }}
                       >
-                        <div className="text-emerald-50 font-semibold">{label}</div>
+                        <div className={`font-semibold ${colors.textPrimary}`}>{label}</div>
                       </button>
                     ))}
                   </div>
@@ -505,29 +704,38 @@ export default function HomePage() {
 
                 {/* 設問 */}
                 <div>
-                  <label className="block text-sm font-medium text-emerald-100 mb-2">
-                    設問 <span className="text-emerald-400">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className={`text-sm font-medium ${colors.textSecondary}`}>
+                      設問 <span className="text-emerald-400">*</span>
+                    </label>
+                    {(generationType === 'motivation' || generationType === 'gakuchika') && (
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        theme === 'dark' ? 'text-emerald-400 bg-emerald-900/30' : 'text-emerald-700 bg-emerald-200 font-medium'
+                      }`}>
+                        デフォルト設問・自由に編集可
+                      </span>
+                    )}
+                  </div>
                   <textarea
                     value={formData.question}
                     onChange={(e) => setFormData({...formData, question: e.target.value})}
                     rows={2}
-                    className="w-full px-4 py-3 rounded-xl border bg-emerald-950/50 text-emerald-50 placeholder-emerald-400/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"
+                    className={`w-full px-4 py-3 rounded-xl border ${colors.inputBg} ${colors.textPrimary} placeholder-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none`}
                     placeholder="例: 学生時代に最も力を入れたことを教えてください"
-                    style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}
+                    style={{ borderColor: colors.border }}
                   />
                 </div>
 
                 {/* 文字数 */}
                 <div>
-                  <label className="block text-sm font-medium text-emerald-100 mb-2">
+                  <label className={`block text-sm font-medium mb-2 ${colors.textSecondary}`}>
                     文字数 <span className="text-emerald-400">*</span>
                   </label>
                   <select
                     value={formData.wordCount}
                     onChange={(e) => setFormData({...formData, wordCount: Number(e.target.value)})}
-                    className="w-full px-4 py-3 rounded-xl border bg-emerald-950/50 text-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                    style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}
+                    className={`w-full px-4 py-3 rounded-xl border ${colors.inputBg} ${colors.textPrimary} focus:outline-none focus:ring-2 focus:ring-emerald-400`}
+                    style={{ borderColor: colors.border }}
                   >
                     {wordCounts.map(count => (
                       <option key={count} value={count}>{count}字</option>
@@ -537,25 +745,51 @@ export default function HomePage() {
 
                 {/* エピソード */}
                 <div>
-                  <label className="block text-sm font-medium text-emerald-100 mb-2">
+                  <label className={`block text-sm font-medium mb-2 ${colors.textSecondary}`}>
                     エピソード <span className="text-emerald-400">*</span>
                   </label>
-                  <div className="mb-2 p-3 rounded-lg bg-emerald-900/30 border border-emerald-700/30">
-                    <div className="text-emerald-200 text-xs mb-1">💡 箇条書きで入力してください:</div>
-                    <div className="text-emerald-300 text-xs space-y-1">
-                      <div>• いつ、何をしましたか？</div>
-                      <div>• どんな困難がありましたか？</div>
-                      <div>• どう解決しましたか？</div>
-                      <div>• 結果はどうでしたか？</div>
+                  <div className={`mb-2 p-3 rounded-lg border ${
+                    theme === 'dark' ? 'bg-emerald-900/20 border-emerald-700/30' : 'bg-emerald-50 border-emerald-200/40'
+                  }`}>
+                    <div className={`text-xs mb-1 ${colors.textSecondary}`}>💡 箇条書きで入力してください:</div>
+                    <div className={`text-xs space-y-1 ${colors.textTertiary}`}>
+                      {generationType === 'motivation' ? (
+                        <>
+                          <div>• なぜこの業界・企業に興味を持ちましたか？</div>
+                          <div>• どんな経験がきっかけですか？</div>
+                          <div>• 企業のどこに魅力を感じますか？</div>
+                          <div>• 入社後に何をしたいですか？</div>
+                        </>
+                      ) : generationType === 'gakuchika' ? (
+                        <>
+                          <div>• いつ、何に取り組みましたか？</div>
+                          <div>• どんな困難・課題がありましたか？</div>
+                          <div>• どう工夫・努力しましたか？</div>
+                          <div>• 結果と学んだことは？</div>
+                        </>
+                      ) : (
+                        <>
+                          <div>• いつ、何をしましたか？</div>
+                          <div>• どんな困難がありましたか？</div>
+                          <div>• どう解決しましたか？</div>
+                          <div>• 結果はどうでしたか？</div>
+                        </>
+                      )}
                     </div>
                   </div>
                   <textarea
                     value={formData.episode}
                     onChange={(e) => setFormData({...formData, episode: e.target.value})}
                     rows={6}
-                    className="w-full px-4 py-3 rounded-xl border bg-emerald-950/50 text-emerald-50 placeholder-emerald-400/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"
-                    placeholder="• サークル代表として50人をまとめた&#10;• コロナで活動中止の危機&#10;• オンライン活動に切り替え&#10;• 参加率80%を達成"
-                    style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}
+                    className={`w-full px-4 py-3 rounded-xl border ${colors.inputBg} ${colors.textPrimary} placeholder-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none`}
+                    placeholder={
+                      generationType === 'motivation' 
+                        ? "• 大学の授業で○○業界の可能性を知った\n• インターンシップで実際の仕事を体験\n• 御社の○○という理念に共感\n• ○○の分野で新しい価値を創造したい"
+                        : generationType === 'gakuchika'
+                        ? "• サークル代表として50人をまとめた\n• コロナで活動中止の危機\n• オンライン活動に切り替えた\n• 参加率80%を達成、チームワークを学んだ"
+                        : "• サークル代表として50人をまとめた\n• コロナで活動中止の危機\n• オンライン活動に切り替え\n• 参加率80%を達成"
+                    }
+                    style={{ borderColor: colors.border }}
                   />
                 </div>
 
@@ -565,7 +799,7 @@ export default function HomePage() {
                   className="w-full py-4 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                    boxShadow: '0 8px 32px rgba(16, 185, 129, 0.3)',
+                    boxShadow: '0 8px 32px rgba(16, 185, 129, 0.4)',
                     color: 'white'
                   }}
                 >
@@ -588,15 +822,17 @@ export default function HomePage() {
           {/* サイドバー */}
           <div className="space-y-6">
             {credits === 0 && (
-              <div className="rounded-2xl p-6 border-2" style={{
-                background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%)',
-                borderColor: 'rgba(251, 191, 36, 0.3)'
+              <div className={`rounded-2xl p-6 border-2 transition-all duration-300`} style={{
+                background: theme === 'dark' 
+                  ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%)'
+                  : 'linear-gradient(135deg, rgba(254, 243, 199, 0.8) 0%, rgba(253, 230, 138, 0.6) 100%)',
+                borderColor: 'rgba(251, 191, 36, 0.4)'
               }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <Users className="w-6 h-6 text-amber-400" />
-                  <h3 className="text-lg font-bold text-amber-100">無料で続ける</h3>
+                  <Users className="w-6 h-6 text-amber-500" />
+                  <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-amber-100' : 'text-amber-900'}`}>無料で続ける</h3>
                 </div>
-                <p className="text-emerald-100 text-sm mb-4">
+                <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-emerald-100' : 'text-gray-700'}`}>
                   友達を紹介すると、さらに5回無料で使えます！
                 </p>
                 <button
@@ -613,25 +849,25 @@ export default function HomePage() {
               </div>
             )}
 
-            <div className="rounded-2xl p-6 border-2" style={{
-              background: 'linear-gradient(135deg, rgba(6, 78, 59, 0.6) 0%, rgba(4, 120, 87, 0.4) 100%)',
-              borderColor: 'rgba(16, 185, 129, 0.3)'
+            <div className={`rounded-2xl p-6 border-2 transition-all duration-300`} style={{
+              background: colors.cardBg,
+              borderColor: colors.border
             }}>
               <div className="flex items-center gap-3 mb-4">
                 <Crown className="w-6 h-6 text-amber-400" />
-                <h3 className="text-lg font-bold text-emerald-50">プレミアム特典</h3>
+                <h3 className={`text-lg font-bold ${colors.textPrimary}`}>プレミアム特典</h3>
               </div>
               <ul className="space-y-3 mb-6">
                 {['生成 無制限', '複数パターン生成', '詳細添削', '広告なし'].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-2 text-emerald-100 text-sm">
+                  <li key={i} className={`flex items-center gap-2 text-sm ${colors.textSecondary}`}>
                     <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
               <div className="text-center mb-4">
-                <div className="text-3xl font-bold text-emerald-50 mb-1">¥480</div>
-                <div className="text-emerald-200 text-sm">/月</div>
+                <div className={`text-3xl font-bold mb-1 ${colors.textPrimary}`}>¥480</div>
+                <div className={`text-sm ${colors.textSecondary}`}>/月</div>
               </div>
               <button
                 onClick={() => alert('プレミアムプランは準備中です')}
@@ -652,51 +888,66 @@ export default function HomePage() {
       {/* 生成結果モーダル */}
       {showResult && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 overflow-y-auto" onClick={() => setShowResult(false)}>
-          <div className="rounded-2xl p-6 md:p-8 max-w-3xl w-full my-8" style={{
-            background: 'linear-gradient(135deg, rgba(6, 78, 59, 0.98) 0%, rgba(4, 120, 87, 0.98) 100%)',
-            border: '2px solid rgba(16, 185, 129, 0.4)',
+          <div className={`rounded-2xl p-6 md:p-8 max-w-3xl w-full my-8 transition-all duration-300`} style={{
+            background: theme === 'dark'
+              ? 'linear-gradient(135deg, rgba(6, 78, 59, 0.98) 0%, rgba(4, 120, 87, 0.98) 100%)'
+              : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 253, 244, 0.98) 100%)',
+            border: '2px solid rgba(16, 185, 129, 0.5)',
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
           }} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <Sparkles className="w-8 h-8 text-emerald-300" />
-                <h3 className="text-2xl md:text-3xl font-bold text-emerald-50">
+                <Sparkles className="w-8 h-8 text-emerald-400" />
+                <h3 className={`text-2xl md:text-3xl font-bold ${colors.textPrimary}`}>
                   {companyInput}用ES 生成完了！
                 </h3>
               </div>
               <button
                 onClick={() => setShowResult(false)}
-                className="p-2 rounded-lg hover:bg-emerald-800/50 transition-colors"
+                className={`p-2 rounded-lg transition-colors ${
+                  theme === 'dark' ? 'hover:bg-emerald-800/50' : 'hover:bg-emerald-100'
+                }`}
               >
-                <X className="w-6 h-6 text-emerald-200" />
+                <X className={`w-6 h-6 ${colors.textSecondary}`} />
               </button>
             </div>
 
             <div className="mb-4 flex flex-wrap gap-2 text-sm">
-              <span className="px-3 py-1 rounded-full bg-emerald-800/50 text-emerald-100">
+              <span className={`px-3 py-1 rounded-full ${
+                theme === 'dark' ? 'bg-emerald-800/50 text-emerald-100' : 'bg-emerald-100 text-emerald-900'
+              }`}>
                 {formData.selectionType === 'job' ? '本選考' : 'インターン'}
               </span>
-              <span className="px-3 py-1 rounded-full bg-emerald-800/50 text-emerald-100 flex items-center gap-1">
+              <span className={`px-3 py-1 rounded-full flex items-center gap-1 ${
+                theme === 'dark' ? 'bg-emerald-800/50 text-emerald-100' : 'bg-emerald-100 text-emerald-900'
+              }`}>
                 {selectedCompany?.hasData && <Star className="w-3 h-3 text-amber-400" />}
                 {companyInput}
               </span>
-              <span className="px-3 py-1 rounded-full bg-emerald-800/50 text-emerald-100">
+              <span className={`px-3 py-1 rounded-full ${
+                theme === 'dark' ? 'bg-emerald-800/50 text-emerald-100' : 'bg-emerald-100 text-emerald-900'
+              }`}>
                 {generatedES.length}字 / {formData.wordCount}字
               </span>
               {customValues.length > 0 && (
-                <span className="px-3 py-1 rounded-full bg-amber-800/50 text-amber-100">
+                <span className={`px-3 py-1 rounded-full ${
+                  theme === 'dark' ? 'bg-amber-800/50 text-amber-100' : 'bg-amber-100 text-amber-900'
+                }`}>
                   {customValues.join(' • ')}
                 </span>
               )}
             </div>
 
             <div className="mb-4">
-              <div className="text-emerald-200 text-sm mb-2">設問:</div>
-              <div className="text-emerald-100 font-medium">{formData.question}</div>
+              <div className={`text-sm mb-2 ${colors.textSecondary}`}>設問:</div>
+              <div className={`font-medium ${colors.textPrimary}`}>{formData.question}</div>
             </div>
 
-            <div className="mb-6 p-6 rounded-xl bg-emerald-950/50 border border-emerald-700/30">
-              <div className="text-emerald-50 whitespace-pre-wrap leading-relaxed">
+            <div className={`mb-6 p-6 rounded-xl border`} style={{
+              background: theme === 'dark' ? 'rgba(6, 78, 59, 0.3)' : 'rgba(240, 253, 244, 0.5)',
+              borderColor: colors.border
+            }}>
+              <div className={`whitespace-pre-wrap leading-relaxed ${colors.textPrimary}`}>
                 {generatedES}
               </div>
             </div>
@@ -707,7 +958,7 @@ export default function HomePage() {
                 className="flex-1 py-3 px-4 rounded-xl font-bold transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
                 style={{
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  boxShadow: '0 4px 16px rgba(16, 185, 129, 0.3)',
+                  boxShadow: '0 4px 16px rgba(16, 185, 129, 0.4)',
                   color: 'white'
                 }}
               >
@@ -716,7 +967,11 @@ export default function HomePage() {
               </button>
               <button
                 onClick={() => setShowResult(false)}
-                className="flex-1 py-3 px-4 rounded-xl font-bold transition-all hover:scale-[1.02] border-2 border-emerald-400/50 text-emerald-50 hover:bg-emerald-800/30"
+                className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all hover:scale-[1.02] border-2 ${
+                  theme === 'dark' 
+                    ? 'border-emerald-400/50 text-emerald-50 hover:bg-emerald-800/30'
+                    : 'border-emerald-500/50 text-emerald-900 hover:bg-emerald-50'
+                }`}
               >
                 閉じる
               </button>
@@ -728,26 +983,30 @@ export default function HomePage() {
       {/* 紹介モーダル */}
       {showReferral && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" onClick={() => setShowReferral(false)}>
-          <div className="rounded-2xl p-8 max-w-md w-full" style={{
-            background: 'linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(4, 120, 87, 0.95) 100%)',
-            border: '1px solid rgba(16, 185, 129, 0.3)'
+          <div className={`rounded-2xl p-8 max-w-md w-full transition-all duration-300`} style={{
+            background: theme === 'dark'
+              ? 'linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(4, 120, 87, 0.95) 100%)'
+              : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 244, 0.95) 100%)',
+            border: `1px solid ${colors.border}`
           }} onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-2xl font-bold text-emerald-50 mb-4">友達紹介で+5回</h3>
-            <p className="text-emerald-100 mb-6">
+            <h3 className={`text-2xl font-bold mb-4 ${colors.textPrimary}`}>友達紹介で+5回</h3>
+            <p className={`mb-6 ${colors.textSecondary}`}>
               あなたの紹介リンクから友達が登録すると、両方に特典！
             </p>
-            <div className="bg-emerald-950/50 p-4 rounded-xl mb-6">
-              <div className="text-emerald-200 text-sm mb-2">あなたの紹介リンク:</div>
-              <div className="text-emerald-50 font-mono text-sm break-all">
+            <div className={`p-4 rounded-xl mb-6 ${
+              theme === 'dark' ? 'bg-emerald-950/50' : 'bg-emerald-50'
+            }`}>
+              <div className={`text-sm mb-2 ${colors.textSecondary}`}>あなたの紹介リンク:</div>
+              <div className={`font-mono text-sm break-all ${colors.textPrimary}`}>
                 https://大手突破es.com/ref/DEMO123
               </div>
             </div>
             <div className="space-y-2 mb-6">
-              <div className="flex items-center gap-2 text-emerald-100 text-sm">
+              <div className={`flex items-center gap-2 text-sm ${colors.textSecondary}`}>
                 <CheckCircle className="w-4 h-4 text-emerald-400" />
                 あなた: +5回無料
               </div>
-              <div className="flex items-center gap-2 text-emerald-100 text-sm">
+              <div className={`flex items-center gap-2 text-sm ${colors.textSecondary}`}>
                 <CheckCircle className="w-4 h-4 text-emerald-400" />
                 友達: 8回無料で使える
               </div>
