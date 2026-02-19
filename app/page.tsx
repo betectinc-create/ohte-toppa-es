@@ -1,5 +1,6 @@
 'use client';
 
+import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { useState } from 'react';
 import { Shield, Sparkles, Crown, Users, CheckCircle, Copy, X, FileText, Target, Award, Building2, Star, Edit2, Plus, Trash2, Sun, Moon } from 'lucide-react';
 
@@ -261,6 +262,17 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center gap-3 md:gap-4 flex-wrap">
+              　{/* ログイン/ユーザーボタン */}
+<SignedOut>
+  <SignInButton mode="modal">
+    <button className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-all">
+      ログイン
+    </button>
+  </SignInButton>
+</SignedOut>
+<SignedIn>
+  <UserButton afterSignOutUrl="/" />
+</SignedIn>
               {/* テーマ切り替えボタン */}
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
