@@ -1,4 +1,7 @@
 'use client';
+import { supabase } from './utils/supabase';
+import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
 
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { useState } from 'react';
@@ -84,6 +87,7 @@ const COMPANY_LIST: Company[] = [
 
 export default function HomePage() {
   const [theme, setTheme] = useState<Theme>('dark');
+  const { user } = useUser();
   const [credits, setCredits] = useState(5);
   const [generationType, setGenerationType] = useState<GenerationType>('es');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -105,6 +109,49 @@ export default function HomePage() {
     episode: '',
   });
 
+  const saveES = async () => {
+    if (!user) {
+      alert('ログインしてください');
+      return;
+    }
+
+    try {
+      // 保存数をチェック（無料プランは5個まで）
+      const { count, error: countError } = await supabase
+        .from('user_es')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      if (countError) throw countError;
+
+      // TODO: プレミアムユーザーのチェック（Stripe実装後）
+      const isPremium = false; // 今は全員無料
+
+      if (!isPremium && (count ?? 0) >= 5) {
+        alert('無料プランは5個まで保存できます。\nプレミアムプランで無制限に保存しましょう！');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('user_es')
+        .insert({
+          user_id: user.id,
+          company: companyInput,
+          generation_type: generationType,
+          question: formData.question,
+          episode: formData.episode,
+          generated_text: generatedES,
+          word_count: formData.wordCount,
+        });
+
+      if (error) throw error;
+
+      alert(`ESを保存しました！（残り${4 - (count ?? 0)}個保存可能）`);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('保存に失敗しました');
+    }
+  };
   const wordCounts = Array.from({ length: 15 }, (_, i) => 100 + i * 50);
 
   // テーマの色設定
@@ -271,6 +318,12 @@ export default function HomePage() {
   </SignInButton>
 </SignedOut>
 <SignedIn>
+  <Link href="/history">
+  <button className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold transition-all flex items-center gap-2">
+    <FileText className="w-5 h-5" />
+    履歴
+  </button>
+</Link>
   <UserButton afterSignOutUrl="/" />
 </SignedIn>
               {/* テーマ切り替えボタン */}
@@ -965,6 +1018,18 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
+            <button
+                onClick={saveES}
+                className="flex-1 py-3 px-4 rounded-xl font-bold transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+                style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  boxShadow: '0 4px 16px rgba(16, 185, 129, 0.4)',
+                  color: 'white'
+                }}
+              >
+                <FileText className="w-5 h-5" />
+                保存する
+              </button>
               <button
                 onClick={copyToClipboard}
                 className="flex-1 py-3 px-4 rounded-xl font-bold transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
