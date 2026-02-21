@@ -376,8 +376,8 @@ if (url) {
                 </button>
               </div>
             </div>
-            {/* 2行目: アップグレード + 残り回数 */}
-            <div className="mt-2.5 flex items-center gap-2.5">
+            {/* 2行目: アップグレード + 残り回数（右揃え） */}
+            <div className="mt-2.5 flex items-center justify-end gap-2.5">
               <SignedIn>
                 <button
                   onClick={handleUpgrade}
@@ -416,7 +416,9 @@ if (url) {
               </div>
             </div>
 
-            {/* アップグレード + 残り回数 */}
+            {/* 右寄せ: アップグレード + 残り回数 + ナビ */}
+            <div className="flex-1" />
+
             <SignedIn>
               <button
                 onClick={handleUpgrade}
@@ -433,9 +435,6 @@ if (url) {
               <span className={`text-sm ${colors.textSecondary}`}>無料プラン</span>
               <span className="text-emerald-500 font-bold">残り {credits} 回</span>
             </div>
-
-            {/* 右寄せスペーサー */}
-            <div className="flex-1" />
 
             {/* ナビ */}
             <div className="flex items-center gap-3 flex-shrink-0">
