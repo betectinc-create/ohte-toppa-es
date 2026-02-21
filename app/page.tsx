@@ -101,7 +101,7 @@ export default function HomePage() {
   const [showValuesEdit, setShowValuesEdit] = useState(false);
   const [customValues, setCustomValues] = useState<string[]>([]);
   const [newValue, setNewValue] = useState('');
-  const [useOptimization, setUseOptimization] = useState(true); // 企業データ最適化ON/OFF
+  const [useOptimization, setUseOptimization] = useState(true);
   
   const [formData, setFormData] = useState({
     selectionType: 'job' as SelectionType,
@@ -133,7 +133,6 @@ const checkPremium = async (userId: string): Promise<boolean> => {
     }
 
     try {
-      // 保存数をチェック（無料プランは5個まで）
       const { count, error: countError } = await supabase
         .from('user_es')
         .select('*', { count: 'exact', head: true })
@@ -141,7 +140,6 @@ const checkPremium = async (userId: string): Promise<boolean> => {
 
       if (countError) throw countError;
 
-      // TODO: プレミアムユーザーのチェック（Stripe実装後）
       const isPremium = await checkPremium(user.id);
 
       if (!isPremium && (count ?? 0) >= 5) {
@@ -201,7 +199,6 @@ if (url) {
   };
   const wordCounts = Array.from({ length: 15 }, (_, i) => 100 + i * 50);
 
-  // テーマの色設定
   const colors = theme === 'dark' ? {
     bg: 'linear-gradient(135deg, #0a1f15 0%, #0d2b1e 50%, #0f3626 100%)',
     headerBg: 'linear-gradient(to bottom, rgba(5, 20, 15, 0.98), rgba(10, 30, 20, 0.95))',
@@ -222,7 +219,6 @@ if (url) {
     border: 'rgba(16, 185, 129, 0.3)',
   };
 
-  // 生成タイプが変わったときにデフォルトの設問を設定
   const handleGenerationTypeChange = (type: GenerationType) => {
     setGenerationType(type);
     
@@ -247,7 +243,7 @@ if (url) {
     setSelectedCompany(company);
     setShowSuggestions(false);
     setCustomValues(company.values || []);
-    setUseOptimization(true); // 企業選択時は最適化ON
+    setUseOptimization(true);
   };
 
   const handleCompanyInputChange = (value: string) => {
@@ -258,11 +254,11 @@ if (url) {
     setSelectedCompany(exactMatch || null);
     if (exactMatch) {
       setCustomValues(exactMatch.values || []);
-      setUseOptimization(true); // 企業選択時は最適化ON
+      setUseOptimization(true);
     } else {
       setCustomValues([]);
       if (value) {
-        setUseOptimization(true); // 新しい企業入力時も最適化ON
+        setUseOptimization(true);
       }
     }
   };
@@ -299,7 +295,7 @@ if (url) {
         },
         body: JSON.stringify({
           company: companyInput,
-          values: useOptimization ? customValues : [], // 最適化OFFの時は空配列
+          values: useOptimization ? customValues : [],
           question: formData.question,
           episode: formData.episode,
           wordCount: formData.wordCount,
@@ -333,101 +329,101 @@ if (url) {
     <div className="min-h-screen transition-all duration-300" style={{
       background: colors.bg
     }}>
+      {/* ===== ヘッダー（スマホ対応済み） ===== */}
       <header className={`border-b transition-all duration-300 ${theme === 'dark' ? 'border-emerald-500/20' : 'border-emerald-300/30'}`} style={{
         background: colors.headerBg,
         backdropFilter: 'blur(20px)'
       }}>
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <Shield className="w-10 h-10 md:w-12 md:h-12 text-emerald-400" strokeWidth={1.5} />
-              <div>
-                <h1 className="text-xl md:text-3xl font-bold" style={{
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-3 md:py-6">
+          {/* 上段: ロゴ + ナビアイコン（常に1行） */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <Shield className="w-8 h-8 md:w-12 md:h-12 text-emerald-400 flex-shrink-0" strokeWidth={1.5} />
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl md:text-3xl font-bold truncate" style={{
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}>
                   大手突破ES
                 </h1>
-                <p className={`text-xs md:text-sm opacity-80 ${colors.textTertiary}`}>
+                <p className={`text-[10px] sm:text-xs md:text-sm opacity-80 ${colors.textTertiary} hidden sm:block`}>
                   AIで、大手の壁を突破する
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 md:gap-4 flex-wrap">
-              　{/* ログイン/ユーザーボタン */}
-<SignedOut>
-  <SignInButton mode="modal">
-    <button className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-all">
-      ログイン
-    </button>
-  </SignInButton>
-</SignedOut>
-<SignedIn>
-  <button
-  onClick={handleUpgrade}
-  className="px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold transition-all"
->
-  <div className="flex flex-col items-center gap-1">
-    <span className="text-xs opacity-90">生成無制限・内定率UP</span>
-    <div className="flex items-center gap-2">
-      <Crown className="w-5 h-5" />
-      <span>アップグレード</span>
-    </div>
-  </div>
-</button>
-  <Link href="/history">
-  <button className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold transition-all flex items-center gap-2">
-    <FileText className="w-5 h-5" />
-    履歴
-  </button>
-</Link>
-  <UserButton afterSignOutUrl="/" />
-</SignedIn>
-              {/* テーマ切り替えボタン */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-all">
+                    ログイン
+                  </button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/history">
+                  <button className={`p-2 sm:px-3 sm:py-2 rounded-lg transition-all flex items-center gap-1.5 ${
+                    theme === 'dark' ? 'bg-slate-800 hover:bg-slate-700 text-white' : 'bg-white hover:bg-gray-100 text-gray-900 border border-gray-200'
+                  }`}>
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="text-sm font-semibold hidden sm:inline">履歴</span>
+                  </button>
+                </Link>
+                <UserButton afterSignOutUrl="/" />
+              </SignedIn>
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className={`p-2 rounded-lg transition-all hover:scale-110 ${theme === 'dark' ? 'bg-slate-800 text-amber-400' : 'bg-white text-indigo-600'}`}
+                className={`p-2 rounded-lg transition-all hover:scale-110 ${theme === 'dark' ? 'bg-slate-800 text-amber-400' : 'bg-white text-indigo-600 border border-gray-200'}`}
                 title={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
               >
-                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                {theme === 'dark' ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
-
-              <div className="text-right">
-                <div className={`text-sm ${colors.textSecondary}`}>無料プラン</div>
-                <div className="text-emerald-500 font-bold">残り {credits} 回</div>
-              </div>
-
-            
             </div>
           </div>
 
-          <div className="mt-4 flex items-center gap-2">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="h-2 flex-1 rounded-full transition-all"
-                style={{
-                  background: i < credits ? '#10b981' : 'rgba(16, 185, 129, 0.2)'
-                }}
-              />
-            ))}
+          {/* 下段: プラン情報 + アップグレード（コンパクト1行） */}
+          <div className="mt-3 flex items-center gap-3">
+            <SignedIn>
+              <button
+                onClick={handleUpgrade}
+                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 flex-shrink-0"
+              >
+                <Crown className="w-4 h-4" />
+                <span className="hidden sm:inline">アップグレード</span>
+                <span className="sm:hidden">UP</span>
+              </button>
+            </SignedIn>
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <span className={`text-xs sm:text-sm ${colors.textSecondary} flex-shrink-0`}>無料プラン</span>
+              <span className="text-emerald-500 font-bold text-xs sm:text-sm flex-shrink-0">残り {credits} 回</span>
+              <div className="flex items-center gap-1 flex-1 min-w-0">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-1.5 sm:h-2 flex-1 rounded-full transition-all"
+                    style={{
+                      background: i < credits ? '#10b981' : 'rgba(16, 185, 129, 0.2)'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 md:px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            {/* 生成タイプ選択 */}
-            <div className={`rounded-2xl p-6 border transition-all duration-300`} style={{
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          <div className="lg:col-span-2 space-y-4 md:space-y-6">
+            {/* 生成タイプ選択（スマホでも横3列） */}
+            <div className={`rounded-2xl p-4 md:p-6 border transition-all duration-300`} style={{
               background: colors.cardBg,
               backdropFilter: 'blur(20px)',
               borderColor: colors.border,
             }}>
-              <h2 className={`text-xl font-bold mb-4 ${colors.textPrimary}`}>何を作りますか？</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <h2 className={`text-base md:text-xl font-bold mb-3 md:mb-4 ${colors.textPrimary}`}>何を作りますか？</h2>
+              <div className="grid grid-cols-3 gap-2 md:gap-3">
                 {[
                   { type: 'es' as GenerationType, icon: FileText, label: 'ES生成' },
                   { type: 'motivation' as GenerationType, icon: Target, label: '志望動機' },
@@ -436,7 +432,7 @@ if (url) {
                   <button
                     key={type}
                     onClick={() => handleGenerationTypeChange(type)}
-                    className={`p-4 rounded-xl border-2 transition-all ${
+                    className={`p-3 md:p-4 rounded-xl border-2 transition-all ${
                       generationType === type ? 'border-emerald-400' : `${theme === 'dark' ? 'border-emerald-700/30' : 'border-emerald-300/40'}`
                     }`}
                     style={{
@@ -445,34 +441,34 @@ if (url) {
                         : theme === 'dark' ? 'rgba(6, 78, 59, 0.3)' : 'rgba(220, 252, 231, 0.5)'
                     }}
                   >
-                    <Icon className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
-                    <div className={`font-semibold ${colors.textPrimary}`}>{label}</div>
+                    <Icon className="w-5 h-5 md:w-6 md:h-6 text-emerald-400 mx-auto mb-1 md:mb-2" />
+                    <div className={`font-semibold text-xs sm:text-sm md:text-base ${colors.textPrimary}`}>{label}</div>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* 入力フォーム */}
-            <div className={`rounded-2xl p-6 md:p-8 border transition-all duration-300`} style={{
+            <div className={`rounded-2xl p-4 md:p-8 border transition-all duration-300`} style={{
               background: colors.cardBg,
               backdropFilter: 'blur(20px)',
               borderColor: colors.border,
               boxShadow: theme === 'dark' ? '0 8px 32px rgba(0, 0, 0, 0.5)' : '0 8px 32px rgba(0, 0, 0, 0.1)'
             }}>
-              <div className="flex items-center gap-3 mb-2">
-                <Building2 className="w-6 h-6 text-emerald-400" />
-                <h2 className={`text-2xl font-bold ${colors.textPrimary}`}>
+              <div className="flex items-center gap-2 md:gap-3 mb-2">
+                <Building2 className="w-5 h-5 md:w-6 md:h-6 text-emerald-400 flex-shrink-0" />
+                <h2 className={`text-base sm:text-lg md:text-2xl font-bold ${colors.textPrimary} truncate`}>
                   {companyInput ? `${companyInput}用${generationType === 'es' ? 'ES' : generationType === 'motivation' ? '志望動機' : 'ガクチカ'}作成` : 'どの企業のESを作りますか？'}
                 </h2>
               </div>
               
               {companyInput && (
-                <p className={`text-sm mb-6 ${colors.textTertiary}`}>
+                <p className={`text-xs sm:text-sm mb-4 md:mb-6 ${colors.textTertiary}`}>
                   ✨ {companyInput}に最適化したESを生成します
                 </p>
               )}
 
-              <div className="space-y-5">
+              <div className="space-y-4 md:space-y-5">
                 {/* 企業名 */}
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${colors.textSecondary}`}>
@@ -484,7 +480,7 @@ if (url) {
                       value={companyInput}
                       onChange={(e) => handleCompanyInputChange(e.target.value)}
                       onFocus={() => setShowSuggestions(companyInput.length > 0)}
-                      className={`w-full px-4 py-3 rounded-xl border ${colors.inputBg} ${colors.textPrimary} placeholder-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400`}
+                      className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base ${colors.inputBg} ${colors.textPrimary} placeholder-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400`}
                       placeholder="企業名を検索・選択..."
                       style={{ borderColor: colors.border }}
                     />
@@ -496,18 +492,18 @@ if (url) {
                           <button
                             key={company.name}
                             onClick={() => handleCompanySelect(company)}
-                            className={`w-full px-4 py-3 text-left transition-colors border-b last:border-b-0 ${
+                            className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-left transition-colors border-b last:border-b-0 ${
                               theme === 'dark' ? 'hover:bg-emerald-800/50 border-emerald-700/30' : 'hover:bg-emerald-50 border-emerald-200/30'
                             }`}
                           >
                             <div className="flex items-center gap-2">
                               {company.hasData && <Star className="w-4 h-4 text-amber-400 flex-shrink-0" />}
-                              <div className="flex-1">
-                                <div className={`font-medium ${colors.textPrimary}`}>{company.name}</div>
+                              <div className="flex-1 min-w-0">
+                                <div className={`font-medium text-sm sm:text-base ${colors.textPrimary}`}>{company.name}</div>
                                 <div className={`text-xs ${colors.textTertiary}`}>{company.industry}</div>
                               </div>
                               {company.hasData && (
-                                <span className={`text-xs px-2 py-1 rounded ${theme === 'dark' ? 'text-emerald-300 bg-emerald-800/50' : 'text-emerald-700 bg-emerald-100'}`}>
+                                <span className={`text-xs px-2 py-1 rounded flex-shrink-0 ${theme === 'dark' ? 'text-emerald-300 bg-emerald-800/50' : 'text-emerald-700 bg-emerald-100'}`}>
                                   データあり
                                 </span>
                               )}
@@ -519,14 +515,14 @@ if (url) {
                   </div>
                   
                   <div className={`mt-2 flex items-center gap-2 text-xs ${colors.textTertiary}`}>
-                    <Building2 className="w-4 h-4" />
+                    <Building2 className="w-4 h-4 flex-shrink-0" />
                     <span>現在50社のデータあり • 企業は随時追加中！</span>
                   </div>
 
                   {/* 企業データ表示・編集 */}
                   {selectedCompany && selectedCompany.hasData && (
                     <div 
-                      className="mt-3 p-5 rounded-xl border-2 relative transition-all duration-300"
+                      className="mt-3 p-3 sm:p-5 rounded-xl border-2 relative transition-all duration-300"
                       style={{
                         background: theme === 'dark' 
                           ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%)'
@@ -537,19 +533,17 @@ if (url) {
                       }}
                     >
                       <div>
-                        <div className="flex items-center gap-3 mb-4">
-                          <Star className="w-6 h-6 text-amber-400" />
-                          <div>
-                            <span className={`font-bold text-lg ${colors.textPrimary}`}>{selectedCompany.name}</span>
-                            <span className="ml-2 text-xs text-emerald-400 bg-emerald-900/30 px-2 py-1 rounded">
-                              ⚡ 企業データあり
-                            </span>
-                          </div>
+                        <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 flex-wrap">
+                          <Star className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
+                          <span className={`font-bold text-base sm:text-lg ${colors.textPrimary}`}>{selectedCompany.name}</span>
+                          <span className="text-[10px] sm:text-xs text-emerald-400 bg-emerald-900/30 px-2 py-0.5 sm:py-1 rounded">
+                            ⚡ 企業データあり
+                          </span>
                         </div>
 
                         {/* チェックボックス */}
                         <div 
-                          className="mb-4 p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02]"
+                          className="mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02]"
                           onClick={() => setUseOptimization(!useOptimization)}
                           style={{
                             background: theme === 'dark' ? 'rgba(6, 78, 59, 0.5)' : 'rgba(220, 252, 231, 0.7)',
@@ -557,22 +551,22 @@ if (url) {
                             boxShadow: useOptimization ? '0 2px 12px rgba(16, 185, 129, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.1)',
                           }}
                         >
-                          <div className="flex items-start gap-3">
-                            <div className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center transition-all border-2 ${
+                          <div className="flex items-start gap-2 sm:gap-3">
+                            <div className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded flex items-center justify-center transition-all border-2 ${
                               useOptimization 
                                 ? 'bg-emerald-500 border-emerald-500' 
                                 : 'bg-transparent border-gray-400'
                             }`}>
-                              {useOptimization && <CheckCircle className="w-5 h-5 text-white" />}
+                              {useOptimization && <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
                             </div>
-                            <div className="flex-1">
-                              <div className={`font-semibold ${colors.textPrimary} text-sm mb-1 flex items-center gap-2`}>
-                                この企業の価値観に沿ってESを最適化する
-                                <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
-                                  クリックで切り替え
+                            <div className="flex-1 min-w-0">
+                              <div className={`font-semibold ${colors.textPrimary} text-xs sm:text-sm mb-1 flex items-center gap-1 sm:gap-2 flex-wrap`}>
+                                <span>企業の価値観で最適化</span>
+                                <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
+                                  切り替え
                                 </span>
                               </div>
-                              <div className={`text-xs ${colors.textSecondary}`}>
+                              <div className={`text-[10px] sm:text-xs ${colors.textSecondary}`}>
                                 {useOptimization 
                                   ? '✓ 企業が求める人物像を反映した内容で生成します' 
                                   : '汎用的な内容で生成します（企業データは参考表示のみ）'}
@@ -583,7 +577,7 @@ if (url) {
                         
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <div className={`text-sm font-semibold ${colors.textPrimary} ${!useOptimization && 'opacity-50'}`}>
+                            <div className={`text-xs sm:text-sm font-semibold ${colors.textPrimary} ${!useOptimization && 'opacity-50'}`}>
                               💡 求める人物像{!useOptimization && '（参考）'}:
                             </div>
                             <button
@@ -591,12 +585,12 @@ if (url) {
                                 e.stopPropagation();
                                 setShowValuesEdit(!showValuesEdit);
                               }}
-                              className="text-emerald-400 hover:text-emerald-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-emerald-900/30 flex items-center gap-1"
+                              className="text-emerald-400 hover:text-emerald-300 transition-colors px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg hover:bg-emerald-900/30 flex items-center gap-1"
                               disabled={!useOptimization}
                               style={{ opacity: useOptimization ? 1 : 0.5 }}
                             >
-                              <Edit2 className="w-4 h-4" />
-                              <span className="text-sm font-medium">編集</span>
+                              <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                              <span className="text-xs sm:text-sm font-medium">編集</span>
                             </button>
                           </div>
                           
@@ -604,7 +598,7 @@ if (url) {
                             <div className="space-y-2">
                               {customValues.map((value, index) => (
                                 <div key={index} className="flex items-center gap-2">
-                                  <span className={`flex-1 text-sm px-3 py-2 rounded-lg font-medium ${
+                                  <span className={`flex-1 text-xs sm:text-sm px-3 py-2 rounded-lg font-medium ${
                                     theme === 'dark' ? 'text-emerald-100 bg-emerald-800/40' : 'text-emerald-900 bg-emerald-100'
                                   }`}>
                                     {value}
@@ -625,30 +619,30 @@ if (url) {
                                   onChange={(e) => setNewValue(e.target.value)}
                                   onKeyPress={(e) => e.key === 'Enter' && addCustomValue()}
                                   placeholder="追加する人物像..."
-                                  className={`flex-1 px-3 py-2 text-sm rounded-lg ${colors.inputBg} ${colors.textPrimary} border focus:outline-none focus:ring-2 focus:ring-emerald-400`}
+                                  className={`flex-1 px-3 py-2 text-xs sm:text-sm rounded-lg ${colors.inputBg} ${colors.textPrimary} border focus:outline-none focus:ring-2 focus:ring-emerald-400`}
                                   style={{ borderColor: colors.border }}
                                 />
                                 <button
                                   onClick={addCustomValue}
                                   className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
                                 >
-                                  <Plus className="w-5 h-5 text-white" />
+                                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                                 </button>
                               </div>
                               
                               <button
                                 onClick={() => setShowValuesEdit(false)}
-                                className="text-sm text-emerald-400 hover:text-emerald-300"
+                                className="text-xs sm:text-sm text-emerald-400 hover:text-emerald-300"
                               >
                                 完了
                               </button>
                             </div>
                           ) : (
-                            <div className={`flex flex-wrap gap-2 transition-all ${!useOptimization && 'opacity-50'}`}>
+                            <div className={`flex flex-wrap gap-1.5 sm:gap-2 transition-all ${!useOptimization && 'opacity-50'}`}>
                               {customValues.map((value, index) => (
                                 <span 
                                   key={index} 
-                                  className={`text-sm px-4 py-2 rounded-full font-semibold ${
+                                  className={`text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-full font-semibold ${
                                     theme === 'dark' ? 'text-emerald-100 bg-emerald-700/50' : 'text-emerald-900 bg-emerald-200'
                                   }`}
                                   style={{
@@ -663,7 +657,7 @@ if (url) {
                         </div>
                         
                         {selectedCompany.commonQuestions && (
-                          <div className={`mt-4 text-sm p-4 rounded-lg transition-all ${!useOptimization && 'opacity-50'}`} style={{
+                          <div className={`mt-3 sm:mt-4 text-xs sm:text-sm p-3 sm:p-4 rounded-lg transition-all ${!useOptimization && 'opacity-50'}`} style={{
                             background: theme === 'dark' 
                               ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.2) 100%)'
                               : 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%)',
@@ -681,21 +675,21 @@ if (url) {
                   )}
 
                   {companyInput && !selectedCompany && (
-                    <div className={`mt-3 p-5 rounded-xl border-2 transition-all duration-300`} style={{
+                    <div className={`mt-3 p-3 sm:p-5 rounded-xl border-2 transition-all duration-300`} style={{
                       background: theme === 'dark' 
                         ? 'linear-gradient(135deg, rgba(15, 50, 35, 0.6) 0%, rgba(10, 40, 30, 0.5) 100%)'
                         : 'linear-gradient(135deg, rgba(220, 252, 231, 0.7) 0%, rgba(187, 247, 208, 0.5) 100%)',
                       borderColor: colors.border,
                       opacity: useOptimization ? 1 : 0.6,
                     }}>
-                      <div className="mb-4 flex items-center gap-2">
+                      <div className="mb-3 sm:mb-4 flex items-center gap-2">
                         <Building2 className="w-5 h-5 text-emerald-400" />
                         <span className={`font-bold ${colors.textPrimary}`}>{companyInput}</span>
                       </div>
 
                       {/* チェックボックス */}
                       <div 
-                        className="mb-4 p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02]"
+                        className="mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02]"
                         onClick={() => setUseOptimization(!useOptimization)}
                         style={{
                           background: theme === 'dark' ? 'rgba(6, 78, 59, 0.5)' : 'rgba(220, 252, 231, 0.7)',
@@ -703,22 +697,22 @@ if (url) {
                           boxShadow: useOptimization ? '0 2px 12px rgba(16, 185, 129, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.1)',
                         }}
                       >
-                        <div className="flex items-start gap-3">
-                          <div className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center transition-all border-2 ${
+                        <div className="flex items-start gap-2 sm:gap-3">
+                          <div className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded flex items-center justify-center transition-all border-2 ${
                             useOptimization 
                               ? 'bg-emerald-500 border-emerald-500' 
                               : 'bg-transparent border-gray-400'
                           }`}>
-                            {useOptimization && <CheckCircle className="w-5 h-5 text-white" />}
+                            {useOptimization && <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
                           </div>
-                          <div className="flex-1">
-                            <div className={`font-semibold ${colors.textPrimary} text-sm mb-1 flex items-center gap-2`}>
-                              入力した人物像に沿ってESを最適化する
-                              <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
-                                クリックで切り替え
+                          <div className="flex-1 min-w-0">
+                            <div className={`font-semibold ${colors.textPrimary} text-xs sm:text-sm mb-1 flex items-center gap-1 sm:gap-2 flex-wrap`}>
+                              <span>入力した人物像で最適化</span>
+                              <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
+                                切り替え
                               </span>
                             </div>
-                            <div className={`text-xs ${colors.textSecondary}`}>
+                            <div className={`text-[10px] sm:text-xs ${colors.textSecondary}`}>
                               {useOptimization 
                                 ? '✓ 下記の人物像を反映した内容で生成します' 
                                 : '汎用的な内容で生成します'}
@@ -728,13 +722,13 @@ if (url) {
                       </div>
 
                       <div className="space-y-2">
-                        <div className={`text-sm font-medium ${colors.textSecondary} ${!useOptimization && 'opacity-50'}`}>
+                        <div className={`text-xs sm:text-sm font-medium ${colors.textSecondary} ${!useOptimization && 'opacity-50'}`}>
                           💡 求める人物像を入力{!useOptimization && '（参考）'}:
                         </div>
                         
                         {customValues.map((value, index) => (
                           <div key={index} className={`flex items-center gap-2 transition-all ${!useOptimization && 'opacity-50'}`}>
-                            <span className={`flex-1 text-sm px-3 py-2 rounded ${
+                            <span className={`flex-1 text-xs sm:text-sm px-3 py-2 rounded ${
                               theme === 'dark' ? 'text-emerald-100 bg-emerald-800/30' : 'text-emerald-900 bg-emerald-100'
                             }`}>
                               {value}
@@ -757,7 +751,7 @@ if (url) {
                             onChange={(e) => setNewValue(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && addCustomValue()}
                             placeholder="例: リーダーシップ、協調性..."
-                            className={`flex-1 px-3 py-2 text-sm rounded-lg ${colors.inputBg} ${colors.textPrimary} border focus:outline-none focus:ring-2 focus:ring-emerald-400`}
+                            className={`flex-1 px-3 py-2 text-xs sm:text-sm rounded-lg ${colors.inputBg} ${colors.textPrimary} border focus:outline-none focus:ring-2 focus:ring-emerald-400`}
                             style={{ borderColor: colors.border }}
                             disabled={!useOptimization}
                           />
@@ -776,10 +770,10 @@ if (url) {
 
                 {/* 選考タイプ */}
                 <div>
-                  <label className={`block text-sm font-medium mb-3 ${colors.textSecondary}`}>
+                  <label className={`block text-sm font-medium mb-2 sm:mb-3 ${colors.textSecondary}`}>
                     選考タイプ <span className="text-emerald-400">*</span>
                   </label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
                     {[
                       { value: 'job' as SelectionType, label: '本選考' },
                       { value: 'intern' as SelectionType, label: 'インターンシップ' }
@@ -787,7 +781,7 @@ if (url) {
                       <button
                         key={value}
                         onClick={() => setFormData({...formData, selectionType: value})}
-                        className={`p-3 rounded-xl border-2 transition-all ${
+                        className={`p-2.5 sm:p-3 rounded-xl border-2 transition-all ${
                           formData.selectionType === value ? 'border-emerald-400' : `${theme === 'dark' ? 'border-emerald-700/30' : 'border-emerald-300/40'}`
                         }`}
                         style={{
@@ -796,7 +790,7 @@ if (url) {
                             : theme === 'dark' ? 'rgba(6, 78, 59, 0.3)' : 'rgba(220, 252, 231, 0.3)'
                         }}
                       >
-                        <div className={`font-semibold ${colors.textPrimary}`}>{label}</div>
+                        <div className={`font-semibold text-sm sm:text-base ${colors.textPrimary}`}>{label}</div>
                       </button>
                     ))}
                   </div>
@@ -809,7 +803,7 @@ if (url) {
                       設問 <span className="text-emerald-400">*</span>
                     </label>
                     {(generationType === 'motivation' || generationType === 'gakuchika') && (
-                      <span className={`text-xs px-2 py-1 rounded ${
+                      <span className={`text-[10px] sm:text-xs px-2 py-1 rounded ${
                         theme === 'dark' ? 'text-emerald-400 bg-emerald-900/30' : 'text-emerald-700 bg-emerald-200 font-medium'
                       }`}>
                         デフォルト設問・自由に編集可
@@ -820,7 +814,7 @@ if (url) {
                     value={formData.question}
                     onChange={(e) => setFormData({...formData, question: e.target.value})}
                     rows={2}
-                    className={`w-full px-4 py-3 rounded-xl border ${colors.inputBg} ${colors.textPrimary} placeholder-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none`}
+                    className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base ${colors.inputBg} ${colors.textPrimary} placeholder-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none`}
                     placeholder="例: 学生時代に最も力を入れたことを教えてください"
                     style={{ borderColor: colors.border }}
                   />
@@ -834,7 +828,7 @@ if (url) {
                   <select
                     value={formData.wordCount}
                     onChange={(e) => setFormData({...formData, wordCount: Number(e.target.value)})}
-                    className={`w-full px-4 py-3 rounded-xl border ${colors.inputBg} ${colors.textPrimary} focus:outline-none focus:ring-2 focus:ring-emerald-400`}
+                    className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base ${colors.inputBg} ${colors.textPrimary} focus:outline-none focus:ring-2 focus:ring-emerald-400`}
                     style={{ borderColor: colors.border }}
                   >
                     {wordCounts.map(count => (
@@ -848,11 +842,11 @@ if (url) {
                   <label className={`block text-sm font-medium mb-2 ${colors.textSecondary}`}>
                     エピソード <span className="text-emerald-400">*</span>
                   </label>
-                  <div className={`mb-2 p-3 rounded-lg border ${
+                  <div className={`mb-2 p-2.5 sm:p-3 rounded-lg border ${
                     theme === 'dark' ? 'bg-emerald-900/20 border-emerald-700/30' : 'bg-emerald-50 border-emerald-200/40'
                   }`}>
-                    <div className={`text-xs mb-1 ${colors.textSecondary}`}>💡 箇条書きで入力してください:</div>
-                    <div className={`text-xs space-y-1 ${colors.textTertiary}`}>
+                    <div className={`text-[10px] sm:text-xs mb-1 ${colors.textSecondary}`}>💡 箇条書きで入力してください:</div>
+                    <div className={`text-[10px] sm:text-xs space-y-0.5 sm:space-y-1 ${colors.textTertiary}`}>
                       {generationType === 'motivation' ? (
                         <>
                           <div>• なぜこの業界・企業に興味を持ちましたか？</div>
@@ -880,8 +874,8 @@ if (url) {
                   <textarea
                     value={formData.episode}
                     onChange={(e) => setFormData({...formData, episode: e.target.value})}
-                    rows={6}
-                    className={`w-full px-4 py-3 rounded-xl border ${colors.inputBg} ${colors.textPrimary} placeholder-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none`}
+                    rows={5}
+                    className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border text-sm sm:text-base ${colors.inputBg} ${colors.textPrimary} placeholder-emerald-400/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none`}
                     placeholder={
                       generationType === 'motivation' 
                         ? "• 大学の授業で○○業界の可能性を知った\n• インターンシップで実際の仕事を体験\n• 御社の○○という理念に共感\n• ○○の分野で新しい価値を創造したい"
@@ -896,7 +890,7 @@ if (url) {
                 <button
                   onClick={generateContent}
                   disabled={isGenerating || credits === 0}
-                  className="w-full py-4 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3 sm:py-4 rounded-xl font-bold text-sm sm:text-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                     boxShadow: '0 8px 32px rgba(16, 185, 129, 0.4)',
@@ -920,24 +914,24 @@ if (url) {
           </div>
 
           {/* サイドバー */}
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {credits === 0 && (
-              <div className={`rounded-2xl p-6 border-2 transition-all duration-300`} style={{
+              <div className={`rounded-2xl p-4 md:p-6 border-2 transition-all duration-300`} style={{
                 background: theme === 'dark' 
                   ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%)'
                   : 'linear-gradient(135deg, rgba(254, 243, 199, 0.8) 0%, rgba(253, 230, 138, 0.6) 100%)',
                 borderColor: 'rgba(251, 191, 36, 0.4)'
               }}>
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-3 sm:mb-4">
                   <Users className="w-6 h-6 text-amber-500" />
-                  <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-amber-100' : 'text-amber-900'}`}>無料で続ける</h3>
+                  <h3 className={`text-base sm:text-lg font-bold ${theme === 'dark' ? 'text-amber-100' : 'text-amber-900'}`}>無料で続ける</h3>
                 </div>
-                <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-emerald-100' : 'text-gray-700'}`}>
+                <p className={`text-xs sm:text-sm mb-3 sm:mb-4 ${theme === 'dark' ? 'text-emerald-100' : 'text-gray-700'}`}>
                   友達を紹介すると、さらに5回無料で使えます！
                 </p>
                 <button
                   onClick={() => setShowReferral(true)}
-                  className="w-full py-3 rounded-xl font-bold transition-all hover:scale-[1.02]"
+                  className="w-full py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base transition-all hover:scale-[1.02]"
                   style={{
                     background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
                     boxShadow: '0 8px 24px rgba(251, 191, 36, 0.3)',
@@ -949,29 +943,29 @@ if (url) {
               </div>
             )}
 
-            <div className={`rounded-2xl p-6 border-2 transition-all duration-300`} style={{
+            <div className={`rounded-2xl p-4 md:p-6 border-2 transition-all duration-300`} style={{
               background: colors.cardBg,
               borderColor: colors.border
             }}>
-              <div className="flex items-center gap-3 mb-4">
-                <Crown className="w-6 h-6 text-amber-400" />
-                <h3 className={`text-lg font-bold ${colors.textPrimary}`}>プレミアム特典</h3>
+              <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
+                <h3 className={`text-base sm:text-lg font-bold ${colors.textPrimary}`}>プレミアム特典</h3>
               </div>
-              <ul className="space-y-3 mb-6">
+              <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                 {['生成 無制限', '複数パターン生成', '詳細添削', '広告なし'].map((feature, i) => (
-                  <li key={i} className={`flex items-center gap-2 text-sm ${colors.textSecondary}`}>
-                    <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                  <li key={i} className={`flex items-center gap-2 text-xs sm:text-sm ${colors.textSecondary}`}>
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
-              <div className="text-center mb-4">
-                <div className={`text-3xl font-bold mb-1 ${colors.textPrimary}`}>¥480</div>
-                <div className={`text-sm ${colors.textSecondary}`}>/月</div>
+              <div className="text-center mb-3 sm:mb-4">
+                <div className={`text-2xl sm:text-3xl font-bold mb-1 ${colors.textPrimary}`}>¥480</div>
+                <div className={`text-xs sm:text-sm ${colors.textSecondary}`}>/月</div>
               </div>
               <button
-                onClick={() => alert('プレミアムプランは準備中です')}
-                className="w-full py-3 rounded-xl font-bold transition-all hover:scale-[1.02]"
+                onClick={handleUpgrade}
+                className="w-full py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base transition-all hover:scale-[1.02]"
                 style={{
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)',
@@ -987,50 +981,50 @@ if (url) {
 
       {/* 生成結果モーダル */}
       {showResult && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 overflow-y-auto" onClick={() => setShowResult(false)}>
-          <div className={`rounded-2xl p-6 md:p-8 max-w-3xl w-full my-8 transition-all duration-300`} style={{
+        <div className="fixed inset-0 bg-black/70 flex items-start sm:items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto" onClick={() => setShowResult(false)}>
+          <div className={`rounded-2xl p-4 sm:p-6 md:p-8 max-w-3xl w-full my-4 sm:my-8 transition-all duration-300`} style={{
             background: theme === 'dark'
               ? 'linear-gradient(135deg, rgba(6, 78, 59, 0.98) 0%, rgba(4, 120, 87, 0.98) 100%)'
               : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 253, 244, 0.98) 100%)',
             border: '2px solid rgba(16, 185, 129, 0.5)',
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
           }} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <Sparkles className="w-8 h-8 text-emerald-400" />
-                <h3 className={`text-2xl md:text-3xl font-bold ${colors.textPrimary}`}>
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-400 flex-shrink-0" />
+                <h3 className={`text-lg sm:text-2xl md:text-3xl font-bold ${colors.textPrimary} truncate`}>
                   {companyInput}用ES 生成完了！
                 </h3>
               </div>
               <button
                 onClick={() => setShowResult(false)}
-                className={`p-2 rounded-lg transition-colors ${
+                className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
                   theme === 'dark' ? 'hover:bg-emerald-800/50' : 'hover:bg-emerald-100'
                 }`}
               >
-                <X className={`w-6 h-6 ${colors.textSecondary}`} />
+                <X className={`w-5 h-5 sm:w-6 sm:h-6 ${colors.textSecondary}`} />
               </button>
             </div>
 
-            <div className="mb-4 flex flex-wrap gap-2 text-sm">
-              <span className={`px-3 py-1 rounded-full ${
+            <div className="mb-3 sm:mb-4 flex flex-wrap gap-1.5 sm:gap-2 text-xs sm:text-sm">
+              <span className={`px-2 sm:px-3 py-1 rounded-full ${
                 theme === 'dark' ? 'bg-emerald-800/50 text-emerald-100' : 'bg-emerald-100 text-emerald-900'
               }`}>
                 {formData.selectionType === 'job' ? '本選考' : 'インターン'}
               </span>
-              <span className={`px-3 py-1 rounded-full flex items-center gap-1 ${
+              <span className={`px-2 sm:px-3 py-1 rounded-full flex items-center gap-1 ${
                 theme === 'dark' ? 'bg-emerald-800/50 text-emerald-100' : 'bg-emerald-100 text-emerald-900'
               }`}>
                 {selectedCompany?.hasData && <Star className="w-3 h-3 text-amber-400" />}
                 {companyInput}
               </span>
-              <span className={`px-3 py-1 rounded-full ${
+              <span className={`px-2 sm:px-3 py-1 rounded-full ${
                 theme === 'dark' ? 'bg-emerald-800/50 text-emerald-100' : 'bg-emerald-100 text-emerald-900'
               }`}>
                 {generatedES.length}字 / {formData.wordCount}字
               </span>
               {customValues.length > 0 && (
-                <span className={`px-3 py-1 rounded-full ${
+                <span className={`px-2 sm:px-3 py-1 rounded-full ${
                   theme === 'dark' ? 'bg-amber-800/50 text-amber-100' : 'bg-amber-100 text-amber-900'
                 }`}>
                   {customValues.join(' • ')}
@@ -1038,48 +1032,48 @@ if (url) {
               )}
             </div>
 
-            <div className="mb-4">
-              <div className={`text-sm mb-2 ${colors.textSecondary}`}>設問:</div>
-              <div className={`font-medium ${colors.textPrimary}`}>{formData.question}</div>
+            <div className="mb-3 sm:mb-4">
+              <div className={`text-xs sm:text-sm mb-1 sm:mb-2 ${colors.textSecondary}`}>設問:</div>
+              <div className={`font-medium text-sm sm:text-base ${colors.textPrimary}`}>{formData.question}</div>
             </div>
 
-            <div className={`mb-6 p-6 rounded-xl border`} style={{
+            <div className={`mb-4 sm:mb-6 p-4 sm:p-6 rounded-xl border`} style={{
               background: theme === 'dark' ? 'rgba(6, 78, 59, 0.3)' : 'rgba(240, 253, 244, 0.5)',
               borderColor: colors.border
             }}>
-              <div className={`whitespace-pre-wrap leading-relaxed ${colors.textPrimary}`}>
+              <div className={`whitespace-pre-wrap leading-relaxed text-sm sm:text-base ${colors.textPrimary}`}>
                 {generatedES}
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button
                 onClick={saveES}
-                className="flex-1 py-3 px-4 rounded-xl font-bold transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold text-sm sm:text-base transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
                 style={{
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   boxShadow: '0 4px 16px rgba(16, 185, 129, 0.4)',
                   color: 'white'
                 }}
               >
-                <FileText className="w-5 h-5" />
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                 保存する
               </button>
               <button
                 onClick={copyToClipboard}
-                className="flex-1 py-3 px-4 rounded-xl font-bold transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+                className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold text-sm sm:text-base transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
                 style={{
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   boxShadow: '0 4px 16px rgba(16, 185, 129, 0.4)',
                   color: 'white'
                 }}
               >
-                <Copy className="w-5 h-5" />
+                <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
                 コピーする
               </button>
               <button
                 onClick={() => setShowResult(false)}
-                className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all hover:scale-[1.02] border-2 ${
+                className={`flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold text-sm sm:text-base transition-all hover:scale-[1.02] border-2 ${
                   theme === 'dark' 
                     ? 'border-emerald-400/50 text-emerald-50 hover:bg-emerald-800/30'
                     : 'border-emerald-500/50 text-emerald-900 hover:bg-emerald-50'
@@ -1094,31 +1088,31 @@ if (url) {
 
       {/* 紹介モーダル */}
       {showReferral && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" onClick={() => setShowReferral(false)}>
-          <div className={`rounded-2xl p-8 max-w-md w-full transition-all duration-300`} style={{
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-3 sm:p-4 z-50" onClick={() => setShowReferral(false)}>
+          <div className={`rounded-2xl p-5 sm:p-8 max-w-md w-full transition-all duration-300`} style={{
             background: theme === 'dark'
               ? 'linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(4, 120, 87, 0.95) 100%)'
               : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 244, 0.95) 100%)',
             border: `1px solid ${colors.border}`
           }} onClick={(e) => e.stopPropagation()}>
-            <h3 className={`text-2xl font-bold mb-4 ${colors.textPrimary}`}>友達紹介で+5回</h3>
-            <p className={`mb-6 ${colors.textSecondary}`}>
+            <h3 className={`text-xl sm:text-2xl font-bold mb-3 sm:mb-4 ${colors.textPrimary}`}>友達紹介で+5回</h3>
+            <p className={`mb-4 sm:mb-6 text-sm sm:text-base ${colors.textSecondary}`}>
               あなたの紹介リンクから友達が登録すると、両方に特典！
             </p>
-            <div className={`p-4 rounded-xl mb-6 ${
+            <div className={`p-3 sm:p-4 rounded-xl mb-4 sm:mb-6 ${
               theme === 'dark' ? 'bg-emerald-950/50' : 'bg-emerald-50'
             }`}>
-              <div className={`text-sm mb-2 ${colors.textSecondary}`}>あなたの紹介リンク:</div>
-              <div className={`font-mono text-sm break-all ${colors.textPrimary}`}>
+              <div className={`text-xs sm:text-sm mb-2 ${colors.textSecondary}`}>あなたの紹介リンク:</div>
+              <div className={`font-mono text-xs sm:text-sm break-all ${colors.textPrimary}`}>
                 https://大手突破es.com/ref/DEMO123
               </div>
             </div>
-            <div className="space-y-2 mb-6">
-              <div className={`flex items-center gap-2 text-sm ${colors.textSecondary}`}>
+            <div className="space-y-2 mb-4 sm:mb-6">
+              <div className={`flex items-center gap-2 text-xs sm:text-sm ${colors.textSecondary}`}>
                 <CheckCircle className="w-4 h-4 text-emerald-400" />
                 あなた: +5回無料
               </div>
-              <div className={`flex items-center gap-2 text-sm ${colors.textSecondary}`}>
+              <div className={`flex items-center gap-2 text-xs sm:text-sm ${colors.textSecondary}`}>
                 <CheckCircle className="w-4 h-4 text-emerald-400" />
                 友達: 8回無料で使える
               </div>
@@ -1128,7 +1122,7 @@ if (url) {
                 navigator.clipboard.writeText('https://大手突破es.com/ref/DEMO123');
                 alert('リンクをコピーしました！');
               }}
-              className="w-full py-3 rounded-xl font-bold"
+              className="w-full py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base"
               style={{
                 background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 color: 'white'
