@@ -111,9 +111,6 @@ export default function HomePage() {
   });
 const checkPremium = async (userId: string): Promise<boolean> => {
     try {
-      console.log('=== checkPremium ===');
-      console.log('userId:', userId);
-      
       const { data, error } = await supabase
         .from('subscriptions')
         .select('status')
@@ -121,17 +118,9 @@ const checkPremium = async (userId: string): Promise<boolean> => {
         .eq('status', 'active')
         .single();
 
-      console.log('Supabase result:', { data, error });
-
-      if (error) {
-        console.log('Error occurred:', error);
-        return false;
-      }
-      const result = !!data;
-      console.log('isPremium:', result);
-      return result;
-    } catch (err) {
-      console.log('Catch error:', err);
+      if (error) return false;
+      return !!data;
+    } catch {
       return false;
     }
   };
