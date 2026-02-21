@@ -163,30 +163,20 @@ export default function HomePage() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-3 md:py-4">
           {/* モバイル */}
-          <div className="md:hidden">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Shield className="w-7 h-7 text-emerald-600" strokeWidth={1.5} />
-                <h1 className="text-lg font-bold text-gray-900">大手突破ES</h1>
-              </div>
-              <div className="flex items-center gap-2">
-                <SignedOut><SignInButton mode="modal"><button className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold">ログイン</button></SignInButton></SignedOut>
-                <SignedIn>
-                  <Link href="/history"><button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"><FileText className="w-4 h-4" /></button></Link>
-                  <UserButton afterSignOutUrl="/" />
-                </SignedIn>
-              </div>
+          <div className="md:hidden flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Shield className="w-7 h-7 text-emerald-600" strokeWidth={1.5} />
+              <h1 className="text-lg font-bold text-gray-900">大手突破ES</h1>
             </div>
-            <div className="mt-2.5 flex items-center justify-end gap-2.5">
+            <div className="flex items-center gap-2">
+              <SignedOut><SignInButton mode="modal"><button className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold">ログイン</button></SignInButton></SignedOut>
               <SignedIn>
-                <button onClick={handleUpgrade} className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold text-sm flex items-center gap-2 shadow-sm">
-                  <Crown className="w-4 h-4" /> アップグレード
+                <button onClick={handleUpgrade} className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                  <Crown className="w-3.5 h-3.5" /> UP
                 </button>
+                <Link href="/history"><button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"><FileText className="w-4 h-4" /></button></Link>
+                <UserButton afterSignOutUrl="/" />
               </SignedIn>
-              <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200">
-                <span className="text-xs text-gray-500">無料</span>
-                <span className="text-emerald-600 font-bold text-sm">残{credits}回</span>
-              </div>
             </div>
           </div>
           {/* PC */}
@@ -204,10 +194,6 @@ export default function HomePage() {
                 <Crown className="w-5 h-5" /> アップグレード
               </button>
             </SignedIn>
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200">
-              <span className="text-sm text-gray-500">無料プラン</span>
-              <span className="text-emerald-600 font-bold">残り {credits} 回</span>
-            </div>
             <SignedOut><SignInButton mode="modal"><button className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold">ログイン</button></SignInButton></SignedOut>
             <SignedIn>
               <Link href="/history"><button className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center gap-2"><FileText className="w-5 h-5" /><span className="text-sm font-semibold">履歴</span></button></Link>
