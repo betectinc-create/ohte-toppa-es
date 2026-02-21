@@ -365,7 +365,7 @@ if (url) {
   </SignInButton>
 </SignedOut>
 <SignedIn>
- <button
+  <button
   onClick={handleUpgrade}
   className="px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold transition-all"
 >
