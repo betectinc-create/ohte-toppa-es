@@ -399,20 +399,7 @@ if (url) {
                 <div className="text-emerald-500 font-bold">残り {credits} 回</div>
               </div>
 
-              {/* プレミアムエリア - 横並び */}
-              <div className="flex items-center gap-2 px-3 py-2 rounded-full" style={{
-                background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%)',
-                border: '1px solid rgba(251, 191, 36, 0.3)',
-              }}>
-                <span className="text-xs font-bold whitespace-nowrap" style={{
-                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent'
-                }}>
-                  ✨ 生成無制限・内定率UP
-                </span>
-                
-              </div>
+            
             </div>
           </div>
 
