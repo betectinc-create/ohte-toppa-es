@@ -172,9 +172,14 @@ const checkPremium = async (userId: string): Promise<boolean> => {
           word_count: formData.wordCount,
         });
 
-      if (error) throw error;
 
-      alert(`ESを保存しました！（残り${4 - (count ?? 0)}個保存可能）`);
+     if (error) throw error;
+
+      if (isPremium) {
+        alert('ESを保存しました！（プレミアムプラン）');
+      } else {
+        alert(`ESを保存しました！（残り${4 - (count ?? 0)}個保存可能）`);
+      }
     } catch (error) {
       console.error('Error:', error);
       alert('保存に失敗しました');
