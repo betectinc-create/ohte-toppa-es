@@ -329,30 +329,52 @@ if (url) {
     <div className="min-h-screen transition-all duration-300" style={{
       background: colors.bg
     }}>
-      {/* ===== ヘッダー（スマホ対応済み） ===== */}
+      {/* ===== ヘッダー ===== */}
       <header className={`border-b transition-all duration-300 ${theme === 'dark' ? 'border-emerald-500/20' : 'border-emerald-300/30'}`} style={{
         background: colors.headerBg,
         backdropFilter: 'blur(20px)'
       }}>
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-3 md:py-6">
-          {/* 上段: ロゴ + ナビアイコン（常に1行） */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <Shield className="w-8 h-8 md:w-12 md:h-12 text-emerald-400 flex-shrink-0" strokeWidth={1.5} />
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-3 md:py-4">
+          {/* 1行ヘッダー: ロゴ | アップグレード | プラン | 履歴・アバター・テーマ */}
+          <div className="flex items-center justify-between gap-3">
+            {/* 左: ロゴ */}
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
+              <Shield className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-emerald-400 flex-shrink-0" strokeWidth={1.5} />
               <div className="min-w-0">
-                <h1 className="text-lg sm:text-xl md:text-3xl font-bold truncate" style={{
+                <h1 className="text-base sm:text-lg md:text-2xl font-bold truncate" style={{
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}>
                   大手突破ES
                 </h1>
-                <p className={`text-[10px] sm:text-xs md:text-sm opacity-80 ${colors.textTertiary} hidden sm:block`}>
+                <p className={`text-[10px] md:text-xs opacity-80 ${colors.textTertiary} hidden md:block`}>
                   AIで、大手の壁を突破する
                 </p>
               </div>
             </div>
 
+            {/* 中央: アップグレード + プラン情報 */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-center min-w-0">
+              <SignedIn>
+                <button
+                  onClick={handleUpgrade}
+                  className="px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold transition-all hover:scale-105 flex items-center gap-1.5 sm:gap-2 shadow-lg flex-shrink-0"
+                  style={{ boxShadow: '0 4px 16px rgba(245, 158, 11, 0.4)' }}
+                >
+                  <Crown className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-sm">アップグレード</span>
+                </button>
+              </SignedIn>
+              <div className={`flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg flex-shrink-0 ${
+                theme === 'dark' ? 'bg-emerald-900/40' : 'bg-emerald-100'
+              }`}>
+                <span className={`text-[10px] sm:text-xs ${colors.textSecondary}`}>無料</span>
+                <span className="text-emerald-500 font-bold text-xs sm:text-sm">残り {credits} 回</span>
+              </div>
+            </div>
+
+            {/* 右: ナビ */}
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <SignedOut>
                 <SignInButton mode="modal">
@@ -379,35 +401,6 @@ if (url) {
               >
                 {theme === 'dark' ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
-            </div>
-          </div>
-
-          {/* 下段: プラン情報 + アップグレード（コンパクト1行） */}
-          <div className="mt-3 flex items-center gap-3">
-            <SignedIn>
-              <button
-                onClick={handleUpgrade}
-                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 flex-shrink-0"
-              >
-                <Crown className="w-4 h-4" />
-                <span className="hidden sm:inline">アップグレード</span>
-                <span className="sm:hidden">UP</span>
-              </button>
-            </SignedIn>
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className={`text-xs sm:text-sm ${colors.textSecondary} flex-shrink-0`}>無料プラン</span>
-              <span className="text-emerald-500 font-bold text-xs sm:text-sm flex-shrink-0">残り {credits} 回</span>
-              <div className="flex items-center gap-1 flex-1 min-w-0">
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-1.5 sm:h-2 flex-1 rounded-full transition-all"
-                    style={{
-                      background: i < credits ? '#10b981' : 'rgba(16, 185, 129, 0.2)'
-                    }}
-                  />
-                ))}
-              </div>
             </div>
           </div>
         </div>
