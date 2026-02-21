@@ -32,9 +32,8 @@ export async function POST(req: NextRequest) {
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}?canceled=true`,
-      metadata: {
+      success_url: `https://ohte-toppa-es-git-main-natsus-projects-02eec683.vercel.app?success=true`,
+cancel_url: `https://ohte-toppa-es-git-main-natsus-projects-02eec683.vercel.app?canceled=true`,
         userId,
       },
     });
