@@ -381,17 +381,14 @@ if (url) {
               <SignedIn>
                 <button
                   onClick={handleUpgrade}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold transition-all flex items-center gap-2 flex-1"
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold transition-all flex items-center gap-2"
                   style={{ boxShadow: '0 4px 16px rgba(245, 158, 11, 0.4)' }}
                 >
-                  <Crown className="w-5 h-5" />
-                  <div className="flex flex-col items-start">
-                    <span className="text-[10px] leading-tight opacity-90">生成無制限・内定率UP</span>
-                    <span className="text-sm leading-tight">アップグレード</span>
-                  </div>
+                  <Crown className="w-4 h-4" />
+                  <span className="text-sm">アップグレード</span>
                 </button>
               </SignedIn>
-              <div className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl flex-shrink-0 ${
+              <div className={`flex items-center gap-1.5 px-3 py-2 rounded-xl ${
                 theme === 'dark' ? 'bg-emerald-900/40 border border-emerald-500/20' : 'bg-emerald-100 border border-emerald-200'
               }`}>
                 <span className={`text-xs ${colors.textSecondary}`}>無料</span>
@@ -401,10 +398,10 @@ if (url) {
           </div>
 
           {/* === PC版ヘッダー (md以上) === */}
-          <div className="hidden md:flex items-center justify-between">
-            {/* 左: ロゴ */}
-            <div className="flex items-center gap-3">
-              <Shield className="w-10 h-10 text-emerald-400 flex-shrink-0" strokeWidth={1.5} />
+          <div className="hidden md:flex items-center gap-4">
+            {/* ロゴ */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <Shield className="w-10 h-10 text-emerald-400" strokeWidth={1.5} />
               <div>
                 <h1 className="text-2xl font-bold" style={{
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
@@ -419,31 +416,29 @@ if (url) {
               </div>
             </div>
 
-            {/* 中央: アップグレード + 残り回数 */}
-            <div className="flex items-center gap-3">
-              <SignedIn>
-                <button
-                  onClick={handleUpgrade}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold transition-all hover:scale-105 flex items-center gap-2"
-                  style={{ boxShadow: '0 4px 20px rgba(245, 158, 11, 0.4)' }}
-                >
-                  <Crown className="w-5 h-5" />
-                  <div className="flex flex-col items-start">
-                    <span className="text-[10px] leading-tight opacity-90">生成無制限・内定率UP</span>
-                    <span className="text-sm leading-tight">アップグレード</span>
-                  </div>
-                </button>
-              </SignedIn>
-              <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl ${
-                theme === 'dark' ? 'bg-emerald-900/40 border border-emerald-500/20' : 'bg-emerald-100 border border-emerald-200'
-              }`}>
-                <span className={`text-sm ${colors.textSecondary}`}>無料プラン</span>
-                <span className="text-emerald-500 font-bold text-base">残り {credits} 回</span>
-              </div>
+            {/* アップグレード + 残り回数 */}
+            <SignedIn>
+              <button
+                onClick={handleUpgrade}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold transition-all hover:scale-105 flex items-center gap-2"
+                style={{ boxShadow: '0 4px 20px rgba(245, 158, 11, 0.4)' }}
+              >
+                <Crown className="w-5 h-5" />
+                <span>アップグレード</span>
+              </button>
+            </SignedIn>
+            <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl ${
+              theme === 'dark' ? 'bg-emerald-900/40 border border-emerald-500/20' : 'bg-emerald-100 border border-emerald-200'
+            }`}>
+              <span className={`text-sm ${colors.textSecondary}`}>無料プラン</span>
+              <span className="text-emerald-500 font-bold">残り {credits} 回</span>
             </div>
 
-            {/* 右: ナビ */}
-            <div className="flex items-center gap-3">
+            {/* 右寄せスペーサー */}
+            <div className="flex-1" />
+
+            {/* ナビ */}
+            <div className="flex items-center gap-3 flex-shrink-0">
               <SignedOut>
                 <SignInButton mode="modal">
                   <button className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-all">
@@ -465,7 +460,6 @@ if (url) {
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                 className={`p-2.5 rounded-lg transition-all hover:scale-110 ${theme === 'dark' ? 'bg-slate-800 text-amber-400' : 'bg-white text-indigo-600 border border-gray-200'}`}
-                title={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
               >
                 {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
