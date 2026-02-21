@@ -12,6 +12,11 @@ export async function POST(req: NextRequest) {
   const body = await req.text();
   const signature = req.headers.get('stripe-signature')!;
 
+  console.log('=== Webhook Debug ===');
+  console.log('Webhook Secret exists:', !!webhookSecret);
+  console.log('Webhook Secret length:', webhookSecret?.length);
+  console.log('Signature exists:', !!signature);
+
   let event: Stripe.Event;
 
   try {
