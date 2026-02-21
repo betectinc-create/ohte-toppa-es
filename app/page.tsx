@@ -109,6 +109,22 @@ export default function HomePage() {
     wordCount: 400,
     episode: '',
   });
+const checkPremium = async (userId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('status')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .single();
+
+      if (error) return false;
+      return !!data;
+    } catch {
+      return false;
+    }
+  };
+
 
   const saveES = async () => {
     if (!user) {
@@ -126,7 +142,7 @@ export default function HomePage() {
       if (countError) throw countError;
 
       // TODO: プレミアムユーザーのチェック（Stripe実装後）
-      const isPremium = false; // 今は全員無料
+      const isPremium = await checkPremium(user.id);
 
       if (!isPremium && (count ?? 0) >= 5) {
         alert('無料プランは5個まで保存できます。\nプレミアムプランで無制限に保存しましょう！');
