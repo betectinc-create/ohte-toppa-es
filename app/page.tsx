@@ -2,10 +2,11 @@
 import { supabase } from './utils/supabase';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
+import { loadStripe } from '@stripe/stripe-js';
 
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { useState } from 'react';
-import { Shield, Sparkles, Crown, Users, CheckCircle, Copy, X, FileText, Target, Award, Building2, Star, Edit2, Plus, Trash2, Sun, Moon } from 'lucide-react';
+import { Shield, Sparkles, Crown, Users, Building, CheckCircle, Copy, X, FileText, Target, Award, Building2, Star, Edit2, Plus, Trash2, Sun, Moon } from 'lucide-react';
 
 type GenerationType = 'es' | 'motivation' | 'gakuchika';
 type SelectionType = 'job' | 'intern';
@@ -150,6 +151,31 @@ export default function HomePage() {
     } catch (error) {
       console.error('Error:', error);
       alert('保存に失敗しました');
+    }
+  };
+  const handleUpgrade = async () => {
+    if (!user) {
+      alert('ログインしてください');
+      return;
+    }
+
+    try {
+      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+      
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      const { url } = await response.json();
+
+if (url) {
+  window.location.href = url;
+}
+    } catch (error) {
+      console.error('Error:', error);
+      alert('アップグレードに失敗しました');
     }
   };
   const wordCounts = Array.from({ length: 15 }, (_, i) => 100 + i * 50);
@@ -318,6 +344,13 @@ export default function HomePage() {
   </SignInButton>
 </SignedOut>
 <SignedIn>
+  <button
+                onClick={handleUpgrade}
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold transition-all flex items-center gap-2"
+              >
+                <Crown className="w-5 h-5" />
+                アップグレード
+              </button>
   <Link href="/history">
   <button className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold transition-all flex items-center gap-2">
     <FileText className="w-5 h-5" />
