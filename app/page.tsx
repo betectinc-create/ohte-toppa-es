@@ -335,74 +335,143 @@ if (url) {
         backdropFilter: 'blur(20px)'
       }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-3 md:py-4">
-          {/* 1行ヘッダー: ロゴ | アップグレード | プラン | 履歴・アバター・テーマ */}
-          <div className="flex items-center justify-between gap-3">
-            {/* 左: ロゴ */}
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
-              <Shield className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-emerald-400 flex-shrink-0" strokeWidth={1.5} />
-              <div className="min-w-0">
-                <h1 className="text-base sm:text-lg md:text-2xl font-bold truncate" style={{
+
+          {/* === モバイル版ヘッダー (md未満) === */}
+          <div className="md:hidden">
+            {/* 1行目: ロゴ + 右アイコン */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Shield className="w-7 h-7 text-emerald-400 flex-shrink-0" strokeWidth={1.5} />
+                <h1 className="text-lg font-bold" style={{
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}>
                   大手突破ES
                 </h1>
-                <p className={`text-[10px] md:text-xs opacity-80 ${colors.textTertiary} hidden md:block`}>
+              </div>
+              <div className="flex items-center gap-2">
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <button className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-all">
+                      ログイン
+                    </button>
+                  </SignInButton>
+                </SignedOut>
+                <SignedIn>
+                  <Link href="/history">
+                    <button className={`p-2 rounded-lg transition-all ${
+                      theme === 'dark' ? 'bg-slate-800 hover:bg-slate-700 text-white' : 'bg-white hover:bg-gray-100 text-gray-900 border border-gray-200'
+                    }`}>
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </Link>
+                  <UserButton afterSignOutUrl="/" />
+                </SignedIn>
+                <button
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  className={`p-2 rounded-lg transition-all ${theme === 'dark' ? 'bg-slate-800 text-amber-400' : 'bg-white text-indigo-600 border border-gray-200'}`}
+                >
+                  {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            {/* 2行目: アップグレード + 残り回数 */}
+            <div className="mt-2.5 flex items-center gap-2.5">
+              <SignedIn>
+                <button
+                  onClick={handleUpgrade}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold transition-all flex items-center gap-2 flex-1"
+                  style={{ boxShadow: '0 4px 16px rgba(245, 158, 11, 0.4)' }}
+                >
+                  <Crown className="w-5 h-5" />
+                  <div className="flex flex-col items-start">
+                    <span className="text-[10px] leading-tight opacity-90">生成無制限・内定率UP</span>
+                    <span className="text-sm leading-tight">アップグレード</span>
+                  </div>
+                </button>
+              </SignedIn>
+              <div className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl flex-shrink-0 ${
+                theme === 'dark' ? 'bg-emerald-900/40 border border-emerald-500/20' : 'bg-emerald-100 border border-emerald-200'
+              }`}>
+                <span className={`text-xs ${colors.textSecondary}`}>無料</span>
+                <span className="text-emerald-500 font-bold text-sm">残{credits}回</span>
+              </div>
+            </div>
+          </div>
+
+          {/* === PC版ヘッダー (md以上) === */}
+          <div className="hidden md:flex items-center justify-between">
+            {/* 左: ロゴ */}
+            <div className="flex items-center gap-3">
+              <Shield className="w-10 h-10 text-emerald-400 flex-shrink-0" strokeWidth={1.5} />
+              <div>
+                <h1 className="text-2xl font-bold" style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                  大手突破ES
+                </h1>
+                <p className={`text-xs opacity-80 ${colors.textTertiary}`}>
                   AIで、大手の壁を突破する
                 </p>
               </div>
             </div>
 
-            {/* 中央: アップグレード + プラン情報 */}
-            <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-center min-w-0">
+            {/* 中央: アップグレード + 残り回数 */}
+            <div className="flex items-center gap-3">
               <SignedIn>
                 <button
                   onClick={handleUpgrade}
-                  className="px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold transition-all hover:scale-105 flex items-center gap-1.5 sm:gap-2 shadow-lg flex-shrink-0"
-                  style={{ boxShadow: '0 4px 16px rgba(245, 158, 11, 0.4)' }}
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold transition-all hover:scale-105 flex items-center gap-2"
+                  style={{ boxShadow: '0 4px 20px rgba(245, 158, 11, 0.4)' }}
                 >
-                  <Crown className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="text-xs sm:text-sm">アップグレード</span>
+                  <Crown className="w-5 h-5" />
+                  <div className="flex flex-col items-start">
+                    <span className="text-[10px] leading-tight opacity-90">生成無制限・内定率UP</span>
+                    <span className="text-sm leading-tight">アップグレード</span>
+                  </div>
                 </button>
               </SignedIn>
-              <div className={`flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg flex-shrink-0 ${
-                theme === 'dark' ? 'bg-emerald-900/40' : 'bg-emerald-100'
+              <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl ${
+                theme === 'dark' ? 'bg-emerald-900/40 border border-emerald-500/20' : 'bg-emerald-100 border border-emerald-200'
               }`}>
-                <span className={`text-[10px] sm:text-xs ${colors.textSecondary}`}>無料</span>
-                <span className="text-emerald-500 font-bold text-xs sm:text-sm">残り {credits} 回</span>
+                <span className={`text-sm ${colors.textSecondary}`}>無料プラン</span>
+                <span className="text-emerald-500 font-bold text-base">残り {credits} 回</span>
               </div>
             </div>
 
             {/* 右: ナビ */}
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <div className="flex items-center gap-3">
               <SignedOut>
                 <SignInButton mode="modal">
-                  <button className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-all">
+                  <button className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-all">
                     ログイン
                   </button>
                 </SignInButton>
               </SignedOut>
               <SignedIn>
                 <Link href="/history">
-                  <button className={`p-2 sm:px-3 sm:py-2 rounded-lg transition-all flex items-center gap-1.5 ${
+                  <button className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${
                     theme === 'dark' ? 'bg-slate-800 hover:bg-slate-700 text-white' : 'bg-white hover:bg-gray-100 text-gray-900 border border-gray-200'
                   }`}>
-                    <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="text-sm font-semibold hidden sm:inline">履歴</span>
+                    <FileText className="w-5 h-5" />
+                    <span className="text-sm font-semibold">履歴</span>
                   </button>
                 </Link>
                 <UserButton afterSignOutUrl="/" />
               </SignedIn>
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className={`p-2 rounded-lg transition-all hover:scale-110 ${theme === 'dark' ? 'bg-slate-800 text-amber-400' : 'bg-white text-indigo-600 border border-gray-200'}`}
+                className={`p-2.5 rounded-lg transition-all hover:scale-110 ${theme === 'dark' ? 'bg-slate-800 text-amber-400' : 'bg-white text-indigo-600 border border-gray-200'}`}
                 title={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
               >
-                {theme === 'dark' ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
+                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
             </div>
           </div>
+
         </div>
       </header>
 
