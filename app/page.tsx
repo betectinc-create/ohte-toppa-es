@@ -365,13 +365,18 @@ if (url) {
   </SignInButton>
 </SignedOut>
 <SignedIn>
-  <button
-                onClick={handleUpgrade}
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold transition-all flex items-center gap-2"
-              >
-                <Crown className="w-5 h-5" />
-                アップグレード
-              </button>
+ <button
+  onClick={handleUpgrade}
+  className="px-4 py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold transition-all"
+>
+  <div className="flex flex-col items-center gap-1">
+    <span className="text-xs opacity-90">生成無制限・内定率UP</span>
+    <div className="flex items-center gap-2">
+      <Crown className="w-5 h-5" />
+      <span>アップグレード</span>
+    </div>
+  </div>
+</button>
   <Link href="/history">
   <button className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold transition-all flex items-center gap-2">
     <FileText className="w-5 h-5" />
@@ -407,17 +412,6 @@ if (url) {
                   ✨ 生成無制限・内定率UP
                 </span>
                 
-                <button
-                  onClick={() => alert('プレミアムプランは準備中です')}
-                  className="px-4 py-2 rounded-full font-semibold text-xs transition-all hover:scale-105 whitespace-nowrap"
-                  style={{
-                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                    boxShadow: '0 2px 12px rgba(16, 185, 129, 0.3)',
-                    color: 'white'
-                  }}
-                >
-                  プレミアムへ
-                </button>
               </div>
             </div>
           </div>
