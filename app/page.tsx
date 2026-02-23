@@ -475,8 +475,9 @@ export default function HomePage() {
 
       {/* 紹介モーダル */}
       {showReferral && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-3 z-50" onMouseDown={(e) => { if (e.target === e.currentTarget) setShowReferral(false); }}>
-          <div className="bg-white rounded-2xl p-5 sm:p-8 max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-3 z-50" onClick={() => {}} onTouchEnd={(e) => e.stopPropagation()}>
+  <div className="absolute inset-0" onClick={() => setShowReferral(false)} />
+          <div className="relative z-10 bg-white rounded-2xl p-5 sm:p-8 max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900">友達紹介で+5回</h3>
             <p className="mb-4 sm:mb-6 text-sm text-gray-600">あなたの紹介リンクから友達が登録すると、両方に特典！</p>
             <div className="p-3 sm:p-4 rounded-xl mb-4 bg-gray-50 border border-gray-200"><div className="text-xs sm:text-sm mb-2 text-gray-500">あなたの紹介リンク:</div><div className="font-mono text-xs sm:text-sm break-all text-gray-900">https://大手突破es.com/ref/DEMO123</div></div>
