@@ -419,7 +419,7 @@ export default function HomePage() {
               <div className="bg-amber-50 rounded-2xl p-4 md:p-6 border-2 border-amber-200">
                 <div className="flex items-center gap-3 mb-3"><Users className="w-6 h-6 text-amber-600" /><h3 className="text-base sm:text-lg font-bold text-amber-900">無料で続ける</h3></div>
                 <p className="text-xs sm:text-sm mb-3 text-gray-600">友達を紹介すると、さらに5回無料で使えます！</p>
-                <button onClick={() => setShowReferral(true)} className="w-full py-2.5 rounded-xl font-bold text-sm bg-amber-500 hover:bg-amber-600 text-white shadow-sm">友達を紹介する</button>
+                <button onClick={(e) => { e.stopPropagation(); setShowReferral(true); }} className="w-full py-2.5 rounded-xl font-bold text-sm bg-amber-500 hover:bg-amber-600 text-white shadow-sm">友達を紹介する</button>
               </div>
             )}
             <div className="bg-white rounded-2xl p-4 md:p-6 border border-gray-200 shadow-sm">
