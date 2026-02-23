@@ -45,4 +45,4 @@ export default function PrivacyPage() {
       </main>
     </div>
   );
-}
+}// fix
