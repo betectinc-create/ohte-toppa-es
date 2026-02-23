@@ -559,7 +559,7 @@ export default function HomePage() {
             {/* 添削セクション */}
             <div className="mb-4 sm:mb-6">
               <button onClick={() => isPremium ? reviewES() : handleUpgrade()} disabled={isReviewing}
-                className={`w-full py-2.5 sm:py-3 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all ${isPremium ? 'bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white shadow-sm' : 'bg-gray-100 text-gray-500 border-2 border-dashed border-gray-300'}`}>
+                className={`w-full py-2.5 sm:py-3 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all ${isPremium ? 'bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white shadow-sm' : 'bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white shadow-sm'}`}>
                 {isReviewing ? (<><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> AI添削中...</>) : isPremium ? (<><Edit2 className="w-4 h-4" /> AIで詳細添削する</>) : (<><Crown className="w-4 h-4" /> アップグレードして詳細添削する</>)}
               </button>
               {reviewText && (
