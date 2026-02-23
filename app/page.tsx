@@ -475,7 +475,7 @@ export default function HomePage() {
 
       {/* 紹介モーダル */}
       {showReferral && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-3 z-50" onClick={() => setShowReferral(false)}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-3 z-50" onMouseDown={(e) => { if (e.target === e.currentTarget) setShowReferral(false); }}>
           <div className="bg-white rounded-2xl p-5 sm:p-8 max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900">友達紹介で+5回</h3>
             <p className="mb-4 sm:mb-6 text-sm text-gray-600">あなたの紹介リンクから友達が登録すると、両方に特典！</p>
