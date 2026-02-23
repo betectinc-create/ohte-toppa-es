@@ -5,7 +5,7 @@ import { ArrowLeft, ExternalLink, Mail } from 'lucide-react';
 
 export default function ContactPage() {
   const router = useRouter();
-  const GOOGLE_FORM_URL = 'https://forms.gle/XXXXXXXXXXXXX';
+  const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdXfYqbIDNN2cHxIEAdRJK5wowIIgAzLrNecAmc8vw-2yJKng/viewform?usp=header';
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
