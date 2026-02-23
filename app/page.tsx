@@ -6,9 +6,9 @@ import { loadStripe } from '@stripe/stripe-js';
 
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
-import { Shield, Sparkles, Crown, Users, CheckCircle, Copy, X, FileText, Target, Award, Building2, Star, Edit2, Plus, Trash2 } from 'lucide-react';
+import { Shield, Sparkles, Crown, Users, CheckCircle, Copy, X, FileText, Target, Award, Building2, Star, Edit2, Plus, Trash2, Lock } from 'lucide-react';
 
-type GenerationType = 'es' | 'motivation' | 'gakuchika';
+type GenerationType = 'es' | 'motivation' | 'gakuchika' | 'review';
 type SelectionType = 'job' | 'intern';
 
 interface Company {
@@ -92,6 +92,7 @@ export default function HomePage() {
   const [formData, setFormData] = useState({ selectionType: 'job' as SelectionType, question: '', wordCount: 400, episode: '' });
   const [isReviewing, setIsReviewing] = useState(false);
   const [reviewText, setReviewText] = useState('');
+  const [reviewInputText, setReviewInputText] = useState('');
 
   // DB からクレジット取得
   useEffect(() => {
@@ -120,17 +121,18 @@ export default function HomePage() {
     try {
       const { count, error: countError } = await supabase.from('user_es').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
       if (countError) throw countError;
-      const isPremium = await checkPremium(user.id);
-      if (!isPremium && (count ?? 0) >= 5) { alert('無料プランは5個まで保存できます。\nプレミアムプランで無制限に保存しましょう！'); return; }
+      const isPremiumUser = await checkPremium(user.id);
+      if (!isPremiumUser && (count ?? 0) >= 5) { alert('無料プランは5個まで保存できます。\nプレミアムプランで無制限に保存しましょう！'); return; }
       const { error } = await supabase.from('user_es').insert({ user_id: user.id, company: companyInput, generation_type: generationType, question: formData.question, episode: formData.episode, generated_text: generatedES, word_count: formData.wordCount });
       if (error) throw error;
-      if (isPremium) alert('ESを保存しました！（プレミアムプラン）');
+      if (isPremiumUser) alert('ESを保存しました！（プレミアムプラン）');
       else alert(`ESを保存しました！（残り${4 - (count ?? 0)}個保存可能）`);
     } catch (error) { console.error('Error:', error); alert('保存に失敗しました'); }
   };
 
   const handleUpgrade = async () => {
     if (!user) { alert('ログインしてください'); return; }
+    if (isPremium) return;
     try {
       await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
       const response = await fetch('/api/create-checkout-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id }) });
@@ -142,6 +144,7 @@ export default function HomePage() {
   const wordCounts = Array.from({ length: 15 }, (_, i) => 100 + i * 50);
 
   const handleGenerationTypeChange = (type: GenerationType) => {
+    if (type === 'review' && !isPremium) return;
     setGenerationType(type);
     let q = '';
     if (type === 'motivation') q = 'なぜ当社を志望しますか？';
@@ -166,7 +169,6 @@ export default function HomePage() {
     if (!companyInput || !formData.question || !formData.episode) { alert('必須項目を全て入力してください'); return; }
     setIsGenerating(true);
     try {
-      // クレジット消費（プレミアムはスキップ）
       if (!isPremium) {
         const creditRes = await fetch('/api/credits', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id }) });
         const creditData = await creditRes.json();
@@ -183,13 +185,15 @@ export default function HomePage() {
 
   const copyToClipboard = () => { navigator.clipboard.writeText(generatedES); alert('コピーしました！'); };
 
-  const reviewES = async () => {
+  const reviewES = async (inputText?: string) => {
     if (!user) return;
     if (!isPremium) { alert('詳細添削はプレミアムプラン限定です。アップグレードしてご利用ください。'); return; }
+    const textToReview = inputText || generatedES;
+    if (!textToReview.trim()) { alert('添削するテキストを入力してください。'); return; }
     setIsReviewing(true);
     setReviewText('');
     try {
-      const res = await fetch('/api/review', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, esText: generatedES, company: companyInput, question: formData.question, generationType }) });
+      const res = await fetch('/api/review', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, esText: textToReview, company: companyInput, question: formData.question, generationType: generationType === 'review' ? 'es' : generationType }) });
       const data = await res.json();
       if (data.success) setReviewText(data.review);
       else alert('添削に失敗しました。もう一度お試しください。');
@@ -211,9 +215,15 @@ export default function HomePage() {
             <div className="flex items-center gap-2">
               <SignedOut><SignInButton mode="modal"><button className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold">ログイン</button></SignInButton></SignedOut>
               <SignedIn>
-                <button onClick={handleUpgrade} className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
-                  <Crown className="w-3.5 h-3.5" /> UP
-                </button>
+                {isPremium ? (
+                  <span className="px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 font-bold text-xs flex items-center gap-1.5">
+                    <Crown className="w-3.5 h-3.5" /> Premium
+                  </span>
+                ) : (
+                  <button onClick={handleUpgrade} className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                    <Crown className="w-3.5 h-3.5" /> UP
+                  </button>
+                )}
                 <Link href="/history"><button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"><FileText className="w-4 h-4" /></button></Link>
                 <UserButton afterSignOutUrl="/" />
               </SignedIn>
@@ -230,9 +240,15 @@ export default function HomePage() {
             </div>
             <div className="flex-1" />
             <SignedIn>
-              <button onClick={handleUpgrade} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold flex items-center gap-2 shadow-sm hover:scale-105 transition-all">
-                <Crown className="w-5 h-5" /> アップグレード
-              </button>
+              {isPremium ? (
+                <span className="px-5 py-2.5 rounded-xl bg-amber-100 text-amber-700 font-bold flex items-center gap-2">
+                  <Crown className="w-5 h-5" /> プレミアム会員
+                </span>
+              ) : (
+                <button onClick={handleUpgrade} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold flex items-center gap-2 shadow-sm hover:scale-105 transition-all">
+                  <Crown className="w-5 h-5" /> アップグレード
+                </button>
+              )}
             </SignedIn>
             <SignedOut><SignInButton mode="modal"><button className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold">ログイン</button></SignInButton></SignedOut>
             <SignedIn>
@@ -250,22 +266,91 @@ export default function HomePage() {
             {/* 生成タイプ */}
             <div className="bg-white rounded-2xl p-4 md:p-6 border border-gray-200 shadow-sm">
               <h2 className="text-base md:text-xl font-bold mb-3 md:mb-4 text-gray-900">何を作りますか？</h2>
-              <div className="grid grid-cols-3 gap-2 md:gap-3">
+              <div className="grid grid-cols-4 gap-2 md:gap-3">
                 {([
-                  { type: 'es' as GenerationType, icon: FileText, label: 'ES生成' },
-                  { type: 'motivation' as GenerationType, icon: Target, label: '志望動機' },
-                  { type: 'gakuchika' as GenerationType, icon: Award, label: 'ガクチカ' }
-                ]).map(({ type, icon: Icon, label }) => (
+                  { type: 'es' as GenerationType, icon: FileText, label: 'ES生成', premium: false },
+                  { type: 'motivation' as GenerationType, icon: Target, label: '志望動機', premium: false },
+                  { type: 'gakuchika' as GenerationType, icon: Award, label: 'ガクチカ', premium: false },
+                  { type: 'review' as GenerationType, icon: Edit2, label: '添削', premium: true },
+                ]).map(({ type, icon: Icon, label, premium }) => (
                   <button key={type} onClick={() => handleGenerationTypeChange(type)}
-                    className={`p-3 md:p-4 rounded-xl border-2 transition-all ${generationType === type ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-emerald-300'}`}>
-                    <Icon className={`w-5 h-5 md:w-6 md:h-6 mx-auto mb-1 md:mb-2 ${generationType === type ? 'text-emerald-600' : 'text-gray-400'}`} />
-                    <div className={`font-semibold text-xs sm:text-sm md:text-base ${generationType === type ? 'text-emerald-700' : 'text-gray-600'}`}>{label}</div>
+                    className={`p-3 md:p-4 rounded-xl border-2 transition-all relative ${
+                      premium && !isPremium
+                        ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+                        : generationType === type
+                          ? type === 'review' ? 'border-amber-500 bg-amber-50' : 'border-emerald-500 bg-emerald-50'
+                          : 'border-gray-200 bg-white hover:border-emerald-300'
+                    }`}
+                    disabled={premium && !isPremium}>
+                    {premium && (
+                      <span className={`absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap ${
+                        isPremium ? 'bg-amber-100 text-amber-700' : 'bg-gray-200 text-gray-500'
+                      }`}>
+                        {isPremium ? 'Premium' : <span className="flex items-center gap-0.5"><Lock className="w-2.5 h-2.5" />Premium</span>}
+                      </span>
+                    )}
+                    <Icon className={`w-5 h-5 md:w-6 md:h-6 mx-auto mb-1 md:mb-2 ${
+                      premium && !isPremium ? 'text-gray-300' : generationType === type ? (type === 'review' ? 'text-amber-600' : 'text-emerald-600') : 'text-gray-400'
+                    }`} />
+                    <div className={`font-semibold text-xs sm:text-sm md:text-base ${
+                      premium && !isPremium ? 'text-gray-400' : generationType === type ? (type === 'review' ? 'text-amber-700' : 'text-emerald-700') : 'text-gray-600'
+                    }`}>{label}</div>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* フォーム */}
+            {/* 添削フォーム（プレミアム専用） */}
+            {generationType === 'review' && isPremium && (
+              <div className="bg-white rounded-2xl p-4 md:p-8 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-2 md:gap-3 mb-4">
+                  <Edit2 className="w-5 h-5 md:w-6 md:h-6 text-amber-600 flex-shrink-0" />
+                  <h2 className="text-base sm:text-lg md:text-2xl font-bold text-gray-900">AIで詳細添削</h2>
+                  <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold">Premium</span>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-500 mb-4">作成済みのESを貼り付けて、AIが構成力・具体性・論理性・企業適合度・表現力の5つの観点で添削します。</p>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-gray-700">添削するES <span className="text-amber-600">*</span></label>
+                    <textarea value={reviewInputText} onChange={(e) => setReviewInputText(e.target.value)} rows={8}
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none text-sm sm:text-base"
+                      placeholder="添削したいESの本文をここに貼り付けてください..." />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-gray-700">企業名（任意）</label>
+                    <input type="text" value={companyInput} onChange={(e) => handleCompanyInputChange(e.target.value)}
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
+                      placeholder="企業名を入力すると企業に合わせた添削になります" />
+                  </div>
+
+                  <button onClick={() => reviewES(reviewInputText)} disabled={isReviewing || !reviewInputText.trim()}
+                    className="w-full py-3 sm:py-4 rounded-xl font-bold text-sm sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed bg-amber-500 hover:bg-amber-600 text-white shadow-lg transition-all hover:scale-[1.02]"
+                    style={{ boxShadow: '0 4px 16px rgba(245, 158, 11, 0.3)' }}>
+                    {isReviewing ? (
+                      <span className="flex items-center justify-center gap-2"><div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />AI添削中...</span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2"><Edit2 className="w-5 h-5" />AIで詳細添削する</span>
+                    )}
+                  </button>
+
+                  {reviewText && (
+                    <div className="p-4 sm:p-6 rounded-xl bg-amber-50 border border-amber-200">
+                      <div className="flex items-center gap-2 mb-3"><Edit2 className="w-5 h-5 text-amber-600" /><span className="font-bold text-gray-900">AI添削結果</span></div>
+                      <div className="whitespace-pre-wrap leading-relaxed text-sm text-gray-800">{reviewText}</div>
+                      <button onClick={() => { navigator.clipboard.writeText(reviewText); alert('添削結果をコピーしました！'); }}
+                        className="mt-4 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-900 text-white text-sm font-bold flex items-center gap-2">
+                        <Copy className="w-4 h-4" /> 結果をコピー
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* 生成フォーム（ES/志望動機/ガクチカ） */}
+            {generationType !== 'review' && (
             <div className="bg-white rounded-2xl p-4 md:p-8 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-2 md:gap-3 mb-2">
                 <Building2 className="w-5 h-5 md:w-6 md:h-6 text-emerald-600 flex-shrink-0" />
@@ -413,17 +498,27 @@ export default function HomePage() {
                 </button>
               </div>
             </div>
+            )}
           </div>
 
           {/* サイドバー */}
           <div className="space-y-4 md:space-y-6">
             <div className="bg-white rounded-2xl p-4 md:p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-3 mb-3"><Crown className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" /><h3 className="text-base sm:text-lg font-bold text-gray-900">プレミアム特典</h3></div>
+              {isPremium && (
+                <div className="mb-4 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-center">
+                  <span className="text-sm font-bold text-amber-700 flex items-center justify-center gap-1.5"><Crown className="w-4 h-4" /> ご利用中</span>
+                </div>
+              )}
               <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                 {['生成 無制限', '複数パターン生成', '詳細添削'].map((f, i) => (<li key={i} className="flex items-center gap-2 text-xs sm:text-sm text-gray-600"><CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 flex-shrink-0" /><span>{f}</span></li>))}
               </ul>
-              <div className="text-center mb-3 sm:mb-4"><div className="text-2xl sm:text-3xl font-bold text-gray-900">¥480</div><div className="text-xs sm:text-sm text-gray-500">/月</div></div>
-              <button onClick={handleUpgrade} className="w-full py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">今すぐアップグレード</button>
+              {!isPremium && (
+                <>
+                  <div className="text-center mb-3 sm:mb-4"><div className="text-2xl sm:text-3xl font-bold text-gray-900">¥480</div><div className="text-xs sm:text-sm text-gray-500">/月</div></div>
+                  <button onClick={handleUpgrade} className="w-full py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">今すぐアップグレード</button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -447,7 +542,7 @@ export default function HomePage() {
 
             {/* 添削セクション */}
             <div className="mb-4 sm:mb-6">
-              <button onClick={reviewES} disabled={isReviewing}
+              <button onClick={() => reviewES()} disabled={isReviewing}
                 className={`w-full py-2.5 sm:py-3 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all ${isPremium ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-gray-100 text-gray-500 border-2 border-dashed border-gray-300'}`}>
                 {isReviewing ? (<><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> AI添削中...</>) : isPremium ? (<><Edit2 className="w-4 h-4" /> AIで詳細添削する</>) : (<><Crown className="w-4 h-4 text-amber-500" /> 詳細添削（プレミアム限定）</>)}
               </button>
@@ -468,7 +563,6 @@ export default function HomePage() {
         </div>
       )}
 
-    
       {/* フッター */}
       <footer className="bg-white border-t border-gray-200 mt-8">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-6 md:py-8">
