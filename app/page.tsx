@@ -216,11 +216,11 @@ export default function HomePage() {
               <SignedOut><SignInButton mode="modal"><button className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold">ログイン</button></SignInButton></SignedOut>
               <SignedIn>
                 {isPremium ? (
-                  <span className="px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 font-bold text-xs flex items-center gap-1.5">
+                  <span className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
                     <Crown className="w-3.5 h-3.5" /> Premium
                   </span>
                 ) : (
-                  <button onClick={handleUpgrade} className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                  <button onClick={handleUpgrade} className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm">
                     <Crown className="w-3.5 h-3.5" /> UP
                   </button>
                 )}
@@ -241,11 +241,11 @@ export default function HomePage() {
             <div className="flex-1" />
             <SignedIn>
               {isPremium ? (
-                <span className="px-5 py-2.5 rounded-xl bg-amber-100 text-amber-700 font-bold flex items-center gap-2">
+                <span className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-white font-bold flex items-center gap-2 shadow-sm">
                   <Crown className="w-5 h-5" /> プレミアム会員
                 </span>
               ) : (
-                <button onClick={handleUpgrade} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold flex items-center gap-2 shadow-sm hover:scale-105 transition-all">
+                <button onClick={handleUpgrade} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white font-bold flex items-center gap-2 shadow-sm hover:scale-105 transition-all">
                   <Crown className="w-5 h-5" /> アップグレード
                 </button>
               )}
@@ -284,7 +284,7 @@ export default function HomePage() {
                     disabled={premium && !isPremium}>
                     {premium && (
                       <span className={`absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap ${
-                        isPremium ? 'bg-amber-100 text-amber-700' : 'bg-gray-200 text-gray-500'
+                        isPremium ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-white' : 'bg-gradient-to-r from-gray-300 to-gray-400 text-white'
                       }`}>
                         {isPremium ? 'Premium' : <span className="flex items-center gap-0.5"><Lock className="w-2.5 h-2.5" />Premium</span>}
                       </span>
@@ -306,7 +306,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 md:gap-3 mb-4">
                   <Edit2 className="w-5 h-5 md:w-6 md:h-6 text-amber-600 flex-shrink-0" />
                   <h2 className="text-base sm:text-lg md:text-2xl font-bold text-gray-900">AIで詳細添削</h2>
-                  <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold">Premium</span>
+                  <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-white font-bold">Premium</span>
                 </div>
                 <p className="text-xs sm:text-sm text-gray-500 mb-4">作成済みのESを貼り付けて、AIが構成力・具体性・論理性・企業適合度・表現力の5つの観点で添削します。</p>
 
@@ -326,7 +326,7 @@ export default function HomePage() {
                   </div>
 
                   <button onClick={() => reviewES(reviewInputText)} disabled={isReviewing || !reviewInputText.trim()}
-                    className="w-full py-3 sm:py-4 rounded-xl font-bold text-sm sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed bg-amber-500 hover:bg-amber-600 text-white shadow-lg transition-all hover:scale-[1.02]"
+                    className="w-full py-3 sm:py-4 rounded-xl font-bold text-sm sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white shadow-lg transition-all hover:scale-[1.02]"
                     style={{ boxShadow: '0 4px 16px rgba(245, 158, 11, 0.3)' }}>
                     {isReviewing ? (
                       <span className="flex items-center justify-center gap-2"><div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />AI添削中...</span>
@@ -503,11 +503,27 @@ export default function HomePage() {
 
           {/* サイドバー */}
           <div className="space-y-4 md:space-y-6">
+            {/* 無料ユーザー向け残り回数バナー */}
+            {creditsLoaded && !isPremium && user && (
+              <div className={`rounded-2xl p-4 md:p-6 border-2 ${credits === 0 ? 'bg-red-50 border-red-300' : credits <= 2 ? 'bg-amber-50 border-amber-300' : 'bg-emerald-50 border-emerald-200'}`}>
+                <div className="text-center">
+                  <div className={`text-3xl sm:text-4xl font-black mb-1 ${credits === 0 ? 'text-red-600' : credits <= 2 ? 'text-amber-600' : 'text-emerald-600'}`}>{credits}<span className="text-base font-bold text-gray-500">/5回</span></div>
+                  <div className="text-xs sm:text-sm text-gray-600 mb-3">無料で生成できる残り回数</div>
+                  {credits === 0 ? (
+                    <button onClick={handleUpgrade} className="w-full py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white shadow-sm flex items-center justify-center gap-2">
+                      <Crown className="w-4 h-4" /> プレミアムで無制限に
+                    </button>
+                  ) : (
+                    <p className="text-[10px] sm:text-xs text-gray-400">プレミアムなら無制限で使えます</p>
+                  )}
+                </div>
+              </div>
+            )}
             <div className="bg-white rounded-2xl p-4 md:p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-3 mb-3"><Crown className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" /><h3 className="text-base sm:text-lg font-bold text-gray-900">プレミアム特典</h3></div>
               {isPremium && (
-                <div className="mb-4 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-center">
-                  <span className="text-sm font-bold text-amber-700 flex items-center justify-center gap-1.5"><Crown className="w-4 h-4" /> ご利用中</span>
+                <div className="mb-4 px-3 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 text-center shadow-sm">
+                  <span className="text-sm font-bold text-white flex items-center justify-center gap-1.5"><Crown className="w-4 h-4" /> ご利用中</span>
                 </div>
               )}
               <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
@@ -516,7 +532,7 @@ export default function HomePage() {
               {!isPremium && (
                 <>
                   <div className="text-center mb-3 sm:mb-4"><div className="text-2xl sm:text-3xl font-bold text-gray-900">¥480</div><div className="text-xs sm:text-sm text-gray-500">/月</div></div>
-                  <button onClick={handleUpgrade} className="w-full py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">今すぐアップグレード</button>
+                  <button onClick={handleUpgrade} className="w-full py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white shadow-sm">今すぐアップグレード</button>
                 </>
               )}
             </div>
@@ -543,7 +559,7 @@ export default function HomePage() {
             {/* 添削セクション */}
             <div className="mb-4 sm:mb-6">
               <button onClick={() => reviewES()} disabled={isReviewing}
-                className={`w-full py-2.5 sm:py-3 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all ${isPremium ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-gray-100 text-gray-500 border-2 border-dashed border-gray-300'}`}>
+                className={`w-full py-2.5 sm:py-3 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all ${isPremium ? 'bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white shadow-sm' : 'bg-gray-100 text-gray-500 border-2 border-dashed border-gray-300'}`}>
                 {isReviewing ? (<><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> AI添削中...</>) : isPremium ? (<><Edit2 className="w-4 h-4" /> AIで詳細添削する</>) : (<><Crown className="w-4 h-4 text-amber-500" /> 詳細添削（プレミアム限定）</>)}
               </button>
               {reviewText && (
@@ -559,6 +575,22 @@ export default function HomePage() {
               <button onClick={copyToClipboard} className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-900 text-white"><Copy className="w-4 h-4 sm:w-5 sm:h-5" /> コピーする</button>
               <button onClick={() => setShowResult(false)} className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold text-sm sm:text-base border-2 border-gray-300 text-gray-700 hover:bg-gray-50">閉じる</button>
             </div>
+
+            {/* 無料ユーザー向け課金ナッジ */}
+            {!isPremium && (
+              <div className="mt-4 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200">
+                <div className="flex items-center gap-3">
+                  <Crown className="w-8 h-8 text-amber-500 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-sm text-gray-900">プレミアムで添削＆無制限生成</div>
+                    <div className="text-xs text-gray-500">残り{credits}回 → 月額480円で制限なし</div>
+                  </div>
+                  <button onClick={handleUpgrade} className="px-3 sm:px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white text-xs sm:text-sm font-bold whitespace-nowrap shadow-sm">
+                    UP
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
