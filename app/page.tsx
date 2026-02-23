@@ -162,7 +162,7 @@ export default function HomePage() {
 
   const generateContent = async () => {
     if (!user) { alert('生成にはログインが必要です'); return; }
-    if (!isPremium && credits === 0) { alert('無料枠を使い切りました。プレミアムプランまたは友達紹介をご利用ください。'); return; }
+    if (!isPremium && credits === 0) { alert('無料枠を使い切りました。プレミアムプランにアップグレードしてください。'); return; }
     if (!companyInput || !formData.question || !formData.episode) { alert('必須項目を全て入力してください'); return; }
     setIsGenerating(true);
     try {
@@ -417,13 +417,6 @@ export default function HomePage() {
 
           {/* サイドバー */}
           <div className="space-y-4 md:space-y-6">
-            {creditsLoaded && credits === 0 && (
-              <div className="bg-amber-50 rounded-2xl p-4 md:p-6 border-2 border-amber-200">
-                <div className="flex items-center gap-3 mb-3"><Users className="w-6 h-6 text-amber-600" /><h3 className="text-base sm:text-lg font-bold text-amber-900">無料で続ける</h3></div>
-                <p className="text-xs sm:text-sm mb-3 text-gray-600">友達を紹介すると、さらに5回無料で使えます！</p>
-                <button onClick={(e) => { e.stopPropagation(); setShowReferral(true); }} className="w-full py-2.5 rounded-xl font-bold text-sm bg-amber-500 hover:bg-amber-600 text-white shadow-sm">友達を紹介する</button>
-              </div>
-            )}
             <div className="bg-white rounded-2xl p-4 md:p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-3 mb-3"><Crown className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" /><h3 className="text-base sm:text-lg font-bold text-gray-900">プレミアム特典</h3></div>
               <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
@@ -475,24 +468,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* 紹介モーダル */}
-     {showReferral && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-3 z-50">
-          <div className="bg-white rounded-2xl p-5 sm:p-8 max-w-md w-full shadow-2xl">
-            <div className="flex justify-end mb-2">
-              <button onClick={() => setShowReferral(false)} className="p-2 rounded-lg hover:bg-gray-100">
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            <h3 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900">友達紹介で+5回</h3>
-            <p className="mb-4 sm:mb-6 text-sm text-gray-600">あなたの紹介リンクから友達が登録すると、両方に特典！</p>
-            <div className="p-3 sm:p-4 rounded-xl mb-4 bg-gray-50 border border-gray-200"><div className="text-xs sm:text-sm mb-2 text-gray-500">あなたの紹介リンク:</div><div className="font-mono text-xs sm:text-sm break-all text-gray-900">https://大手突破es.com/ref/DEMO123</div></div>
-            <div className="space-y-2 mb-4"><div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600"><CheckCircle className="w-4 h-4 text-emerald-500" /> あなた: +5回無料</div><div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600"><CheckCircle className="w-4 h-4 text-emerald-500" /> 友達: 8回無料で使える</div></div>
-            <button onClick={() => { navigator.clipboard.writeText('https://大手突破es.com/ref/DEMO123'); alert('リンクをコピーしました！'); }} className="w-full py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base bg-emerald-600 hover:bg-emerald-700 text-white">リンクをコピー</button>
-          </div>
-        </div>
-      )}
-
+    
       {/* フッター */}
       <footer className="bg-white border-t border-gray-200 mt-8">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-6 md:py-8">
