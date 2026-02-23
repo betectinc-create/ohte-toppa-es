@@ -1,89 +1,72 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 
-export async function POST(request: NextRequest) {
-  try {
-    // デバッグ
-    console.log('=== API Route Called ===');
-    console.log('ENV:', process.env.ANTHROPIC_API_KEY ? 'EXISTS' : 'MISSING');
-    
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    
-    if (!apiKey) {
-      console.error('API Key is missing!');
-      return NextResponse.json(
-        { error: 'APIキーが設定されていません', success: false },
-        { status: 500 }
-      );
-    }
-    
-    console.log('API Key found:', apiKey.substring(0, 10) + '...');
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    const anthropic = new Anthropic({
-      apiKey: apiKey,
-    });
+export async function POST(req: NextRequest) {
+  const { company, values, question, episode, wordCount, selectionType } = await req.json();
 
-    const body = await request.json();
-    const { company, values, question, episode, wordCount, selectionType } = body;
+  if (!company || !question || !episode) {
+    return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
+  }
 
-    const valuesText = values && values.length > 0 
-      ? `\n\n${company}が特に求める人物像:\n${values.map((v: string) => `- ${v}`).join('\n')}\n\nこれらの価値観を意識してESを作成してください。`
-      : '';
+  const typeLabel = selectionType === 'intern' ? 'インターンシップ選考' : '本選考';
+  const valuesText = values && values.length > 0
+    ? `\n【企業が求める人物像】${values.join('、')}\n→ これらの要素を自然にESに織り込んでください。ただし直接的に「御社の〇〇という価値観に共感」のような安易な表現は避け、エピソードを通じて自然に伝わるようにしてください。`
+    : '';
 
-    const prompt = `あなたは就活生のES（エントリーシート）作成を支援するプロのキャリアアドバイザーです。
+  const systemPrompt = `あなたは就活のESライティングの専門家です。大手企業の選考を通過するESを作成してください。
 
-【企業情報】
-企業名: ${company}
-選考タイプ: ${selectionType === 'job' ? '本選考' : 'インターンシップ'}${valuesText}
+【重要な執筆ルール】
+1. PREP法を基本とする: 結論→理由→具体例→結論の流れ
+2. 冒頭の一文で読み手の心を掴む: 「私は〜」で始めず、結論や印象的なフレーズから始める
+3. 具体性を重視: 数字（人数、期間、成果等）や固有名詞を必ず含める
+4. 1つのエピソードに絞る: 複数のエピソードを並べず、1つを深掘りする
+5. 課題→行動→結果→学びの流れを明確にする
+6. 「〜と思います」「〜と感じました」等の曖昧な表現を避け、言い切る
+7. 企業視点を意識: 「この人と一緒に働きたい」と思わせる内容にする
+8. AI臭さを排除: テンプレート的な表現、過度に整った文章は避ける。話し言葉に近い自然な文体にする
+9. 文末表現に変化をつける:「〜した」「〜できた」「〜である」等を混ぜる
+10. 最後は入社後の展望や学びの活かし方で締める
 
-【設問】
-${question}
+【避けるべき表現】
+- 「様々な」「多くの」→具体的な数字に置き換え
+- 「コミュニケーション能力」→具体的にどんな場面でどう発揮したか
+- 「成長できた」→何がどう変わったか具体的に
+- 「チームワーク」→具体的にどう協力したか
+- 「〜という経験を通して」→使いすぎ注意、別の接続に
+- 「貴社」→ES では「御社」ではなく「貴社」が正しいが、多用は避ける`;
 
-【学生のエピソード】
+  const userPrompt = `以下の条件でESを作成してください。
+
+【企業】${company}（${typeLabel}）
+【設問】${question}
+【文字数】${wordCount}字程度（±10%以内）${valuesText}
+
+【ユーザーのエピソード素材】
 ${episode}
 
-【指示】
-- 指定文字数: ${wordCount}字（厳守）
-- ${company}の企業文化や価値観に合わせた内容にする
-- 具体的で説得力のある文章にする
-- 「です・ます調」で書く
-- エピソードを効果的に活用する
-- 結論→理由→具体例→結論の構成で書く
+上記の素材をもとに、選考を通過できる質の高いESを${wordCount}字程度で作成してください。
+素材に含まれる情報を最大限活用し、足りない部分は自然に補完してください。
+ただし、事実を捏造しないでください。
 
-上記の条件で、${wordCount}字ぴったりのESを作成してください。文字数は必ず守ってください。`;
+※文字数は厳守してください。出力はES本文のみ（見出しや注釈は不要）。`;
 
-    console.log('Calling Claude API...');
-
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2048,
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o',
       messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
       ],
+      temperature: 0.7,
+      max_tokens: 2000,
     });
 
-    const generatedText = message.content[0].type === 'text' 
-      ? message.content[0].text 
-      : '';
-
-    console.log('Success! Generated:', generatedText.substring(0, 50) + '...');
-
-    return NextResponse.json({ 
-      text: generatedText,
-      success: true 
-    });
-
+    const text = response.choices[0]?.message?.content || '';
+    return NextResponse.json({ success: true, text });
   } catch (error) {
-    console.error('Claude API Error:', error);
-    return NextResponse.json(
-      { 
-        error: 'ES生成に失敗しました',
-        success: false 
-      },
-      { status: 500 }
-    );
+    console.error('Generate error:', error);
+    return NextResponse.json({ success: false, error: 'Generation failed' }, { status: 500 });
   }
 }
