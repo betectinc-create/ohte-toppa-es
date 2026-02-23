@@ -75,6 +75,7 @@ const COMPANY_LIST: Company[] = [
 export default function HomePage() {
   const { user } = useUser();
   const [credits, setCredits] = useState(0);
+  const [creditsLoaded, setCreditsLoaded] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
   const [generationType, setGenerationType] = useState<GenerationType>('es');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -100,8 +101,9 @@ export default function HomePage() {
         .then(data => {
           if (data.isPremium) { setIsPremium(true); setCredits(-1); }
           else { setIsPremium(false); setCredits(data.credits ?? 0); }
+          setCreditsLoaded(true);
         })
-        .catch(() => setCredits(0));
+        .catch(() => { setCredits(0); setCreditsLoaded(true); });
     }
   }, [user]);
 
@@ -415,7 +417,7 @@ export default function HomePage() {
 
           {/* サイドバー */}
           <div className="space-y-4 md:space-y-6">
-            {credits === 0 && (
+            {creditsLoaded && credits === 0 && (
               <div className="bg-amber-50 rounded-2xl p-4 md:p-6 border-2 border-amber-200">
                 <div className="flex items-center gap-3 mb-3"><Users className="w-6 h-6 text-amber-600" /><h3 className="text-base sm:text-lg font-bold text-amber-900">無料で続ける</h3></div>
                 <p className="text-xs sm:text-sm mb-3 text-gray-600">友達を紹介すると、さらに5回無料で使えます！</p>
