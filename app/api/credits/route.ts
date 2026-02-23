@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('userId');
   if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
   try {
-    const { data: sub } = await supabase.from('subscriptions').select('status').eq('user_id', userId).eq('status', 'active').single();
+    const { data: sub } = await supabase.from('subscriptions').select('status').eq('user_id', userId).eq('status', 'active').limit(1).maybeSingle();
     if (sub) return NextResponse.json({ credits: -1, isPremium: true });
     let { data: creditData } = await supabase.from('user_credits').select('*').eq('user_id', userId).single();
     if (!creditData) {
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   const { userId } = await req.json();
   if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
   try {
-    const { data: sub } = await supabase.from('subscriptions').select('status').eq('user_id', userId).eq('status', 'active').single();
+    const { data: sub } = await supabase.from('subscriptions').select('status').eq('user_id', userId).eq('status', 'active').limit(1).maybeSingle();
     if (sub) return NextResponse.json({ credits: -1, isPremium: true, success: true });
     const { data: creditData } = await supabase.from('user_credits').select('*').eq('user_id', userId).single();
     if (!creditData || creditData.credits_remaining <= 0) return NextResponse.json({ error: 'No credits', credits: 0 }, { status: 403 });

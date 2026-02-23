@@ -8,7 +8,7 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env
 export async function POST(req: NextRequest) {
   const { userId, esText, company, question, generationType } = await req.json();
   if (!userId || !esText) return NextResponse.json({ error: 'userId and esText required' }, { status: 400 });
-  const { data: sub } = await supabase.from('subscriptions').select('status').eq('user_id', userId).eq('status', 'active').single();
+  const { data: sub } = await supabase.from('subscriptions').select('status').eq('user_id', userId).eq('status', 'active').limit(1).maybeSingle();
   if (!sub) return NextResponse.json({ error: 'Premium required' }, { status: 403 });
   try {
     const typeLabel = generationType === 'es' ? 'ES' : generationType === 'motivation' ? '志望動機' : 'ガクチカ';
@@ -26,4 +26,4 @@ export async function POST(req: NextRequest) {
     console.error('Review error:', error);
     return NextResponse.json({ error: 'Review failed' }, { status: 500 });
   }
-}
+}z
