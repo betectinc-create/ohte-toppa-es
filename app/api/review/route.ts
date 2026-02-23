@@ -26,4 +26,4 @@ export async function POST(req: NextRequest) {
     console.error('Review error:', error);
     return NextResponse.json({ error: 'Review failed' }, { status: 500 });
   }
-}z
+}
