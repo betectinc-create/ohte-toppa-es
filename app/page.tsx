@@ -6,7 +6,7 @@ import { loadStripe } from '@stripe/stripe-js';
 
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
-import { Shield, Sparkles, Crown, Users, CheckCircle, Copy, X, FileText, Target, Award, Building2, Star, Edit2, Plus, Trash2, Lock, MessageCircle, ExternalLink } from 'lucide-react';
+import { Shield, Sparkles, Crown, Users, CheckCircle, Copy, X, FileText, Target, Award, Building2, Star, Edit2, Plus, Trash2, Lock, ExternalLink } from 'lucide-react';
 
 type GenerationType = 'es' | 'motivation' | 'gakuchika' | 'review';
 type SelectionType = 'job' | 'intern';
@@ -24,8 +24,6 @@ const COMMON_TRAITS = [
   'コミュニケーション力', '行動力', '粘り強さ', '柔軟性', '責任感',
   '誠実さ', 'グローバル志向', '創造力', '当事者意識', 'チームワーク',
 ];
-
-const LINE_URL = 'https://lin.ee/vnanDoG';
 
 const COMPANY_LIST: Company[] = [
   { name: '三菱商事', hasData: true, industry: '総合商社', values: ['構想力', '実行力', '変革力'], commonQuestions: ['学生時代に力を入れたこと', 'なぜ商社か'] },
@@ -255,13 +253,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 md:p-6 border border-blue-200 shadow-sm mb-12">
-            <div className="text-[10px] text-gray-400 mb-2">PR・提携</div>
-            <h3 className="font-bold text-gray-900 mb-1 text-sm md:text-base">ジール就活エージェント</h3>
-            <p className="text-xs md:text-sm text-gray-600 mb-3">プロのキャリアアドバイザーがES添削・面接対策を無料サポート。大手内定実績多数。厚生労働省許可の就活支援サービスです。</p>
-            <a href="https://zeel-jp.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm font-bold transition-all"><ExternalLink className="w-3.5 h-3.5" /> 無料で相談する</a>
-          </div>
-
           <div className="text-center"><SignInButton mode="modal"><button className="px-8 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all">無料で始める</button></SignInButton></div>
         </main>
 
@@ -350,7 +341,6 @@ export default function HomePage() {
             <div className="bg-white rounded-2xl p-4 md:p-8 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-2 md:gap-3 mb-2"><Building2 className="w-5 h-5 md:w-6 md:h-6 text-emerald-600 flex-shrink-0" /><h2 className="text-base sm:text-lg md:text-2xl font-bold text-gray-900 truncate">{companyInput ? `${companyInput}用${generationType === 'es' ? 'ES' : generationType === 'motivation' ? '志望動機' : 'ガクチカ'}作成` : 'どの企業のESを作りますか？'}</h2></div>
 
-              {/* 企業最適化の説明 */}
               {!companyInput && (
                 <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200">
                   <div className="flex items-start gap-2">
@@ -365,7 +355,6 @@ export default function HomePage() {
               {companyInput && <p className="text-xs sm:text-sm mb-4 md:mb-6 text-emerald-600">✨ {companyInput}に最適化したESを生成します</p>}
 
               <div className="space-y-4 md:space-y-5">
-                {/* 企業名 */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700">企業名 <span className="text-emerald-600">*</span></label>
                   <div className="relative">
@@ -378,7 +367,6 @@ export default function HomePage() {
                   </div>
                   <div className="mt-2 flex items-center gap-2 text-xs text-gray-500"><Building2 className="w-4 h-4 flex-shrink-0" /><span>現在50社の企業データで最適化対応 • 随時追加中！</span></div>
 
-                  {/* 企業データあり */}
                   {selectedCompany?.hasData && (
                     <div className="mt-3 p-3 sm:p-5 rounded-xl border-2 border-emerald-400 bg-gradient-to-br from-emerald-50 to-green-50" style={{ opacity: useOptimization ? 1 : 0.6 }}>
                       <div className="flex items-center gap-2 sm:gap-3 mb-3 flex-wrap"><Star className="w-5 h-5 text-amber-500" /><span className="font-bold text-base sm:text-lg text-gray-900">{selectedCompany.name}</span><span className="text-[10px] sm:text-xs text-emerald-700 bg-emerald-200 px-2 py-0.5 rounded font-medium">⚡ 最適化対応企業</span></div>
@@ -406,7 +394,6 @@ export default function HomePage() {
                     </div>
                   )}
 
-                  {/* 企業データなし */}
                   {companyInput && !selectedCompany && (
                     <div className="mt-3 p-3 sm:p-5 rounded-xl border-2 border-gray-200 bg-gray-50" style={{ opacity: useOptimization ? 1 : 0.6 }}>
                       <div className="mb-3 flex items-center gap-2"><Building2 className="w-5 h-5 text-emerald-600" /><span className="font-bold text-gray-900">{companyInput}</span></div>
@@ -424,7 +411,6 @@ export default function HomePage() {
                   )}
                 </div>
 
-                {/* 選考タイプ */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700">選考タイプ <span className="text-emerald-600">*</span></label>
                   <div className="grid grid-cols-2 gap-2 sm:gap-3">
@@ -432,19 +418,16 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* 設問 */}
                 <div>
                   <div className="flex items-center justify-between mb-2"><label className="text-sm font-medium text-gray-700">設問 <span className="text-emerald-600">*</span></label>{(generationType === 'motivation' || generationType === 'gakuchika') && <span className="text-[10px] sm:text-xs px-2 py-1 rounded bg-emerald-100 text-emerald-700 font-medium">デフォルト設問・自由に編集可</span>}</div>
                   <textarea value={formData.question} onChange={(e) => setFormData({...formData, question: e.target.value})} rows={2} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none text-sm sm:text-base" placeholder="例: 学生時代に最も力を入れたことを教えてください" />
                 </div>
 
-                {/* 文字数 */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700">文字数 <span className="text-emerald-600">*</span></label>
                   <select value={formData.wordCount} onChange={(e) => setFormData({...formData, wordCount: Number(e.target.value)})} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm sm:text-base">{wordCounts.map(c => <option key={c} value={c}>{c}字</option>)}</select>
                 </div>
 
-                {/* エピソード */}
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700">エピソード <span className="text-emerald-600">*</span></label>
                   <div className="mb-2 p-2.5 sm:p-3 rounded-lg bg-emerald-50 border border-emerald-200">
@@ -477,29 +460,11 @@ export default function HomePage() {
               </div>
             )}
 
-            {/* LINE友だち追加バナー */}
-            {!isPremium && (
-              <a href={LINE_URL} target="_blank" rel="noopener noreferrer" className="block rounded-2xl p-4 md:p-5 border-2 border-green-400 bg-gradient-to-br from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center flex-shrink-0"><MessageCircle className="w-6 h-6 text-white" /></div>
-                  <div className="flex-1"><div className="font-bold text-sm text-gray-900">LINE追加で+3回プレゼント🎁</div><div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">就活に役立つ情報も配信中</div></div>
-                </div>
-              </a>
-            )}
-
             <div className="bg-white rounded-2xl p-4 md:p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-3 mb-3"><Crown className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" /><h3 className="text-base sm:text-lg font-bold text-gray-900">プレミアム特典</h3></div>
               {isPremium && (<div className="mb-4 px-3 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 text-center shadow-sm"><span className="text-sm font-bold text-white flex items-center justify-center gap-1.5"><Crown className="w-4 h-4" /> ご利用中</span></div>)}
               <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">{['生成 無制限', '複数パターン生成', '詳細添削'].map((f, i) => (<li key={i} className="flex items-center gap-2 text-xs sm:text-sm text-gray-600"><CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 flex-shrink-0" /><span>{f}</span></li>))}</ul>
               {!isPremium && (<><div className="text-center mb-3 sm:mb-4"><div className="text-2xl sm:text-3xl font-bold text-gray-900">¥480</div><div className="text-xs sm:text-sm text-gray-500">/月</div></div><button onClick={handleUpgrade} className="w-full py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white shadow-sm">今すぐアップグレード</button></>)}
-            </div>
-
-            {/* ジール就活エージェント広告 */}
-            <div className="bg-white rounded-2xl p-4 md:p-5 border border-blue-200 shadow-sm">
-              <div className="text-[10px] text-gray-400 mb-2">PR・提携</div>
-              <h3 className="font-bold text-gray-900 text-sm mb-1">ジール就活エージェント</h3>
-              <p className="text-[10px] sm:text-xs text-gray-600 mb-3">プロがES添削・面接対策を無料サポート。大手内定実績多数。</p>
-              <a href="https://zeel-jp.com/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold transition-all"><ExternalLink className="w-3.5 h-3.5" /> 無料で相談する</a>
             </div>
           </div>
         </div>
@@ -529,15 +494,8 @@ export default function HomePage() {
             </div>
 
             {!isPremium && (
-              <div className="mt-4 space-y-3">
-                <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200">
-                  <div className="flex items-center gap-3"><Crown className="w-8 h-8 text-amber-500 flex-shrink-0" /><div className="flex-1 min-w-0"><div className="font-bold text-sm text-gray-900">プレミアムで添削＆無制限生成</div><div className="text-xs text-gray-500">残り{credits}回 → 月額480円で制限なし</div></div><button onClick={handleUpgrade} className="px-3 sm:px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white text-xs sm:text-sm font-bold whitespace-nowrap shadow-sm">UP</button></div>
-                </div>
-                <a href={LINE_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-green-50 border border-green-300 hover:bg-green-100 transition-all">
-                  <div className="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center flex-shrink-0"><MessageCircle className="w-4 h-4 text-white" /></div>
-                  <div className="flex-1"><div className="font-bold text-xs text-gray-900">LINE追加で+3回プレゼント🎁</div><div className="text-[10px] text-gray-500">就活Tipsも配信中</div></div>
-                  <span className="text-xs font-bold text-green-600">追加する →</span>
-                </a>
+              <div className="mt-4 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200">
+                <div className="flex items-center gap-3"><Crown className="w-8 h-8 text-amber-500 flex-shrink-0" /><div className="flex-1 min-w-0"><div className="font-bold text-sm text-gray-900">プレミアムで添削＆無制限生成</div><div className="text-xs text-gray-500">残り{credits}回 → 月額480円で制限なし</div></div><button onClick={handleUpgrade} className="px-3 sm:px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white text-xs sm:text-sm font-bold whitespace-nowrap shadow-sm">UP</button></div>
               </div>
             )}
           </div>
