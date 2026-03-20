@@ -253,6 +253,31 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* 料金プラン */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-12">
+            <div className="bg-white rounded-2xl p-6 md:p-8 border-2 border-gray-200 shadow-sm">
+              <div className="text-sm font-semibold text-emerald-600 mb-2">無料プラン</div>
+              <div className="flex items-end gap-1 mb-4"><span className="text-4xl font-black text-gray-900">¥0</span></div>
+              <ul className="space-y-3 mb-6">
+                {['ES生成 5回まで', '50社の企業データで最適化', 'ES・志望動機・ガクチカ対応', '生成したESの保存（5件まで）'].map((f, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-gray-600"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />{f}</li>
+                ))}
+              </ul>
+              <SignInButton mode="modal"><button className="w-full py-3 rounded-xl font-bold text-base bg-emerald-600 hover:bg-emerald-700 text-white transition-all">無料で始める</button></SignInButton>
+            </div>
+            <div className="bg-white rounded-2xl p-6 md:p-8 border-2 border-amber-400 shadow-sm relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-white text-xs font-bold flex items-center gap-1"><Crown className="w-3.5 h-3.5" />おすすめ</div>
+              <div className="text-sm font-semibold text-amber-600 mb-2">プレミアムプラン</div>
+              <div className="flex items-end gap-1 mb-4"><span className="text-4xl font-black text-gray-900">¥480</span><span className="text-sm text-gray-500 mb-1">/月（税込）</span></div>
+              <ul className="space-y-3 mb-6">
+                {['ES生成 無制限', '50社の企業データで最適化', 'ES・志望動機・ガクチカ対応', 'AI詳細添削（5軸フィードバック）', '複数パターン生成', '保存数 無制限'].map((f, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-gray-600"><CheckCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />{f}</li>
+                ))}
+              </ul>
+              <SignInButton mode="modal"><button className="w-full py-3 rounded-xl font-bold text-base bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white transition-all shadow-sm">まず無料で試す →</button></SignInButton>
+            </div>
+          </div>
+
           <div className="text-center"><SignInButton mode="modal"><button className="px-8 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all">無料で始める</button></SignInButton></div>
         </main>
 
