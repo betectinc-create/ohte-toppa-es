@@ -20,10 +20,10 @@ export default function CommercePage() {
           <table className="w-full text-sm">
             <tbody className="divide-y divide-gray-200">
               <tr><td className="py-4 pr-4 font-semibold text-gray-900 w-1/3">販売業者</td><td className="py-4 text-gray-700">株式会社BETECT</td></tr>
-              <tr><td className="py-4 pr-4 font-semibold text-gray-900">運営責任者</td><td className="py-4 text-gray-700">請求があった場合、遅滞なく開示いたします</td></tr>
-              <tr><td className="py-4 pr-4 font-semibold text-gray-900">所在地</td><td className="py-4 text-gray-700">請求があった場合、遅滞なく開示いたします</td></tr>
-              <tr><td className="py-4 pr-4 font-semibold text-gray-900">電話番号</td><td className="py-4 text-gray-700">請求があった場合、遅滞なく開示いたします</td></tr>
-              <tr><td className="py-4 pr-4 font-semibold text-gray-900">メールアドレス</td><td className="py-4 text-gray-700">お問い合わせページよりご連絡ください</td></tr>
+              <tr><td className="py-4 pr-4 font-semibold text-gray-900">運営責任者</td><td className="py-4 text-gray-700">内山田勇海</td></tr>
+              <tr><td className="py-4 pr-4 font-semibold text-gray-900">所在地</td><td className="py-4 text-gray-700">〒532-0031 大阪府大阪市淀川区加島4-5-3-916</td></tr>
+              <tr><td className="py-4 pr-4 font-semibold text-gray-900">電話番号</td><td className="py-4 text-gray-700">06-7777-6093</td></tr>
+              <tr><td className="py-4 pr-4 font-semibold text-gray-900">メールアドレス</td><td className="py-4 text-gray-700">betect.inc@gmail.com</td></tr>
               <tr><td className="py-4 pr-4 font-semibold text-gray-900">サービス名</td><td className="py-4 text-gray-700">大手突破ES</td></tr>
               <tr><td className="py-4 pr-4 font-semibold text-gray-900">販売価格</td><td className="py-4 text-gray-700">無料プラン: 0円 / プレミアムプラン: 月額480円（税込）</td></tr>
               <tr><td className="py-4 pr-4 font-semibold text-gray-900">支払方法</td><td className="py-4 text-gray-700">クレジットカード（Stripe経由）</td></tr>
