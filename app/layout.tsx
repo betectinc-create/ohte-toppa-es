@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   title: "大手突破ES | AIで大手企業のESを自動生成",
   description: "AIが大手企業50社のデータを元に、企業が求める人物像に最適化したES・志望動機・ガクチカを自動生成。三菱商事、トヨタ、ソニーなど大手企業の通過率を上げる就活AIツール。",
   keywords: ["ES作成", "就活", "AI", "エントリーシート", "志望動機", "ガクチカ", "大手企業", "就活ツール", "ES自動生成"],
+  verification: {
+    google: "lJa3pMfkahu6su93mqUMfdN848y63EV7iL5FXdM4FCo",
+  },
   openGraph: {
     title: "大手突破ES | AIで大手企業のESを自動生成",
     description: "50社以上の企業データでESを最適化。企業が求める人物像に合わせたES・志望動機・ガクチカをAIが自動生成。",
