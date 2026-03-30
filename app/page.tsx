@@ -76,6 +76,56 @@ const COMPANY_LIST: Company[] = [
   { name: 'P&G', hasData: true, industry: '消費財', values: ['リーダーシップ', 'オーナーシップ'], commonQuestions: ['チームをリードした経験', '課題を解決した経験'] },
   { name: '味の素', hasData: true, industry: '食品', values: ['新しい価値の創造', 'ASV'], commonQuestions: ['あなたの強み', '社会に対してやりたいこと'] },
   { name: 'サントリー', hasData: true, industry: '飲料', values: ['やってみなはれ', '利益三分主義'], commonQuestions: ['チャレンジした経験', '情熱を持って取り組んだこと'] },
+  { name: 'NTT', hasData: true, industry: '通信', values: ['変革', '共創', 'グローバル'], commonQuestions: ['社会課題を解決した経験', 'チームで成果を出した経験'] },
+  { name: 'KDDI', hasData: true, industry: '通信', values: ['つなぐ力', '変革'], commonQuestions: ['困難を乗り越えた経験', 'なぜ通信業界か'] },
+  { name: 'ソフトバンク', hasData: true, industry: '通信/IT', values: ['挑戦', '情報革命で人々を幸せに'], commonQuestions: ['No.1になった経験', '成し遂げたいこと'] },
+  { name: 'リクルート', hasData: true, industry: 'IT/サービス', values: ['圧倒的当事者意識', '個の尊重'], commonQuestions: ['自ら機会を作った経験', '起業家精神を発揮した経験'] },
+  { name: '日本IBM', hasData: true, industry: 'IT', values: ['イノベーション', 'クライアント志向'], commonQuestions: ['テクノロジーで課題解決した経験', 'リーダーシップ'] },
+  { name: 'NTTコミュニケーションズ', hasData: true, industry: '通信/IT', values: ['挑戦', '共創'], commonQuestions: ['新しいことに挑戦した経験', 'チームワーク'] },
+  { name: '旭化成', hasData: true, industry: '化学', values: ['挑戦', '多様性'], commonQuestions: ['困難に立ち向かった経験', '自分の強みを活かした経験'] },
+  { name: '花王', hasData: true, industry: '消費財', values: ['よきモノづくり', '正道を歩む'], commonQuestions: ['こだわりを持って取り組んだ経験', '消費者視点で考えた経験'] },
+  { name: '資生堂', hasData: true, industry: '化粧品', values: ['BEAUTY INNOVATIONS', '多様性'], commonQuestions: ['美や価値を追求した経験', 'グローバルな視点で取り組んだ経験'] },
+  { name: '三菱重工業', hasData: true, industry: '重工', values: ['技術力', '使命感'], commonQuestions: ['スケールの大きい目標に挑んだ経験', 'ものづくりへの想い'] },
+  { name: '川崎重工業', hasData: true, industry: '重工', values: ['技術', '挑戦'], commonQuestions: ['技術的な課題に取り組んだ経験', 'チームで成し遂げた経験'] },
+  { name: 'IHI', hasData: true, industry: '重工', values: ['技術をもって社会の発展に貢献'], commonQuestions: ['社会貢献を意識した経験', '困難を乗り越えた経験'] },
+  { name: '村田製作所', hasData: true, industry: '電子部品', values: ['独自性', '技術革新'], commonQuestions: ['独自の視点で取り組んだ経験', 'ものづくりへの興味'] },
+  { name: 'キーエンス', hasData: true, industry: '電子機器', values: ['付加価値', '論理的思考'], commonQuestions: ['成果にこだわった経験', '論理的に課題を解決した経験'] },
+  { name: 'オリックス', hasData: true, industry: '金融/リース', values: ['多角化', '挑戦'], commonQuestions: ['新しい価値を生み出した経験', '変化に対応した経験'] },
+  { name: '住友電気工業', hasData: true, industry: '電線/電子', values: ['技術', '信頼'], commonQuestions: ['地道に取り組んだ経験', 'チームワーク'] },
+  { name: '清水建設', hasData: true, industry: 'ゼネコン', values: ['誠実', '技術力'], commonQuestions: ['ものづくりに関わった経験', 'リーダーシップ'] },
+  { name: '大成建設', hasData: true, industry: 'ゼネコン', values: ['自由闊達', '価値創造'], commonQuestions: ['大きなプロジェクトに関わった経験', '困難を乗り越えた経験'] },
+  { name: '鹿島建設', hasData: true, industry: 'ゼネコン', values: ['進取の精神', '誠実'], commonQuestions: ['挑戦した経験', 'チームで成果を出した経験'] },
+  { name: '竹中工務店', hasData: true, industry: 'ゼネコン', values: ['最良の作品', '棟梁精神'], commonQuestions: ['品質にこだわった経験', 'ものづくりへの想い'] },
+  { name: '日本製鉄', hasData: true, industry: '鉄鋼', values: ['挑戦', '変革'], commonQuestions: ['困難な状況を乗り越えた経験', 'スケールの大きい仕事への想い'] },
+  { name: '武田薬品工業', hasData: true, industry: '製薬', values: ['患者さん中心', '誠実'], commonQuestions: ['他者のために行動した経験', 'グローバルに活躍したい理由'] },
+  { name: 'アステラス製薬', hasData: true, industry: '製薬', values: ['変革', '患者志向'], commonQuestions: ['変化を起こした経験', '社会貢献への想い'] },
+  { name: '第一三共', hasData: true, industry: '製薬', values: ['イノベーション', '誠実'], commonQuestions: ['研究や探究に取り組んだ経験', 'なぜ製薬か'] },
+  { name: 'エーザイ', hasData: true, industry: '製薬', values: ['hhc（ヒューマンヘルスケア）', '患者様貢献'], commonQuestions: ['人の役に立った経験', '社会課題への関心'] },
+  { name: '中外製薬', hasData: true, industry: '製薬', values: ['革新', 'サイエンス'], commonQuestions: ['科学的に課題を解決した経験', 'イノベーションへの想い'] },
+  { name: '明治', hasData: true, industry: '食品', values: ['健康にアイデアを', '挑戦'], commonQuestions: ['食や健康に関心を持ったきっかけ', 'チームで取り組んだ経験'] },
+  { name: '日清食品', hasData: true, industry: '食品', values: ['創造', 'ユニーク'], commonQuestions: ['クリエイティブな発想で取り組んだ経験', '既存の枠を超えた経験'] },
+  { name: 'キリン', hasData: true, industry: '飲料', values: ['熱意', '誠意', '多様性'], commonQuestions: ['情熱を持って取り組んだこと', '多様な人と協働した経験'] },
+  { name: 'アサヒグループ', hasData: true, industry: '飲料', values: ['挑戦', '革新'], commonQuestions: ['新しいことに挑んだ経験', 'チームワーク'] },
+  { name: 'ダイキン', hasData: true, industry: '空調', values: ['人を基軸におく経営', '挑戦'], commonQuestions: ['周囲を巻き込んだ経験', 'グローバルへの関心'] },
+  { name: 'ブリヂストン', hasData: true, industry: 'タイヤ/ゴム', values: ['誠実協調', '進取独創'], commonQuestions: ['品質や安全にこだわった経験', '粘り強く取り組んだ経験'] },
+  { name: 'AGC', hasData: true, industry: 'ガラス/素材', values: ['イノベーション', '多様性'], commonQuestions: ['新しい価値を創造した経験', '異なる考えを受け入れた経験'] },
+  { name: 'TOTO', hasData: true, industry: '住宅設備', values: ['きれい', '快適', '環境'], commonQuestions: ['生活を良くするアイデアを出した経験', 'ものづくりへの関心'] },
+  { name: 'LIXIL', hasData: true, industry: '住宅設備', values: ['起業家精神', 'インクルーシブ'], commonQuestions: ['主体的に行動した経験', '多様性を活かした経験'] },
+  { name: '日本郵船', hasData: true, industry: '海運', values: ['誠意', '創意', '熱意'], commonQuestions: ['グローバルに関心を持ったきっかけ', 'チームで困難を乗り越えた経験'] },
+  { name: '商船三井', hasData: true, industry: '海運', values: ['挑戦', '自律'], commonQuestions: ['困難に立ち向かった経験', '責任を持って取り組んだ経験'] },
+  { name: 'ベネッセ', hasData: true, industry: '教育', values: ['よく生きる', '顧客志向'], commonQuestions: ['人の成長に関わった経験', '教育への想い'] },
+  { name: 'スクウェア・エニックス', hasData: true, industry: 'ゲーム', values: ['最高の物語体験', '創造性'], commonQuestions: ['創作やものづくりに没頭した経験', 'エンタメへの情熱'] },
+  { name: 'バンダイナムコ', hasData: true, industry: 'ゲーム/エンタメ', values: ['夢・遊び・感動'], commonQuestions: ['人を楽しませた経験', '情熱を持って取り組んだこと'] },
+  { name: '東京電力', hasData: true, industry: 'エネルギー', values: ['安定供給', '責任'], commonQuestions: ['社会インフラへの関心', '責任を持って取り組んだ経験'] },
+  { name: '関西電力', hasData: true, industry: 'エネルギー', values: ['安全', '挑戦'], commonQuestions: ['社会貢献を意識した経験', 'チームで課題を解決した経験'] },
+  { name: '東京ガス', hasData: true, industry: 'エネルギー', values: ['安全', '快適', '環境'], commonQuestions: ['生活に密着した課題に取り組んだ経験', '長期的な視点で考えた経験'] },
+  { name: '大阪ガス', hasData: true, industry: 'エネルギー', values: ['進取の精神', '共創'], commonQuestions: ['新しい挑戦をした経験', '周囲と協力した経験'] },
+  { name: '日本テレビ', hasData: true, industry: 'メディア', values: ['創造性', '情熱'], commonQuestions: ['人に影響を与えた経験', 'メディアへの想い'] },
+  { name: 'TBS', hasData: true, industry: 'メディア', values: ['創造', '挑戦'], commonQuestions: ['コンテンツを企画した経験', '情熱を持って取り組んだこと'] },
+  { name: '伊藤園', hasData: true, industry: '飲料', values: ['お客様第一主義', '自然'], commonQuestions: ['顧客視点で考えた経験', '健康や食への関心'] },
+  { name: 'ユニクロ', hasData: true, industry: 'アパレル', values: ['変革', 'グローバル', '顧客志向'], commonQuestions: ['変化を起こした経験', '多様な人と働いた経験'] },
+  { name: '日本銀行', hasData: true, industry: '中央銀行', values: ['公共性', '専門性'], commonQuestions: ['社会全体のために行動した経験', '経済への関心'] },
+  { name: 'JR西日本', hasData: true, industry: '鉄道', values: ['安全', '挑戦', '地域共生'], commonQuestions: ['安全や信頼を意識した経験', '地域に貢献した経験'] },
 ];
 
 export default function HomePage() {
@@ -224,7 +274,7 @@ export default function HomePage() {
 
         <main className="max-w-4xl mx-auto px-4 py-12 md:py-20">
           <div className="text-center mb-10 md:mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold mb-6"><Sparkles className="w-4 h-4" />50社以上の企業データ搭載</div>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold mb-6"><Sparkles className="w-4 h-4" />100社以上の企業データ搭載</div>
             <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-4 md:mb-6 leading-tight">AIが企業に最適化した<br />ESを自動生成</h2>
             <p className="text-base md:text-lg text-gray-600 mb-8 max-w-2xl mx-auto">三菱商事、トヨタ、ソニーなど大手企業が求める人物像を分析し、<br className="hidden md:block" />あなたのエピソードから通過率の高いESを作成します。</p>
             <SignInButton mode="modal"><button className="px-8 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-bold shadow-lg transition-all hover:scale-105" style={{ boxShadow: '0 4px 16px rgba(16, 185, 129, 0.3)' }}><span className="flex items-center gap-2"><Sparkles className="w-5 h-5" />無料で始める（5回まで無料）</span></button></SignInButton>
@@ -232,7 +282,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-12">
             {[
-              { icon: Building2, title: '50社の企業データ', desc: '各企業が求める人物像・頻出設問を搭載。企業ごとに最適化されたESを生成' },
+              { icon: Building2, title: '100社の企業データ', desc: '各企業が求める人物像・頻出設問を搭載。企業ごとに最適化されたESを生成' },
               { icon: Target, title: '企業別最適化', desc: '「構想力」「実行力」など企業の価値観をESに自動反映。通過率を大幅アップ' },
               { icon: Edit2, title: 'AI添削機能', desc: '構成力・具体性・論理性・企業適合度・表現力の5軸で詳細フィードバック' },
             ].map(({ icon: Icon, title, desc }, i) => (
@@ -259,7 +309,7 @@ export default function HomePage() {
               <div className="text-sm font-semibold text-emerald-600 mb-2">無料プラン</div>
               <div className="flex items-end gap-1 mb-4"><span className="text-4xl font-black text-gray-900">¥0</span></div>
               <ul className="space-y-3 mb-6">
-                {['ES生成 5回まで', '50社の企業データで最適化', 'ES・志望動機・ガクチカ対応', '生成したESの保存（5件まで）'].map((f, i) => (
+                {['ES生成 5回まで', '100社の企業データで最適化', 'ES・志望動機・ガクチカ対応', '生成したESの保存（5件まで）'].map((f, i) => (
                   <li key={i} className="flex items-center gap-2 text-sm text-gray-600"><CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />{f}</li>
                 ))}
               </ul>
@@ -270,7 +320,7 @@ export default function HomePage() {
               <div className="text-sm font-semibold text-amber-600 mb-2">プレミアムプラン</div>
               <div className="flex items-end gap-1 mb-4"><span className="text-4xl font-black text-gray-900">¥480</span><span className="text-sm text-gray-500 mb-1">/月（税込）</span></div>
               <ul className="space-y-3 mb-6">
-                {['ES生成 無制限', '50社の企業データで最適化', 'ES・志望動機・ガクチカ対応', 'AI詳細添削（5軸フィードバック）', '複数パターン生成', '保存数 無制限'].map((f, i) => (
+                {['ES生成 無制限', '100社の企業データで最適化', 'ES・志望動機・ガクチカ対応', 'AI詳細添削（5軸フィードバック）', '複数パターン生成', '保存数 無制限'].map((f, i) => (
                   <li key={i} className="flex items-center gap-2 text-sm text-gray-600"><CheckCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />{f}</li>
                 ))}
               </ul>
@@ -372,7 +422,7 @@ export default function HomePage() {
                     <Star className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                     <div className="text-xs sm:text-sm text-gray-700">
                       <span className="font-bold text-emerald-700">企業名を入力すると、その企業が求める人物像に合わせてESを最適化！</span>
-                      <span className="block mt-1 text-gray-500">50社以上のデータを搭載。同じエピソードでも企業ごとに刺さる表現に変わります。</span>
+                      <span className="block mt-1 text-gray-500">100社以上のデータを搭載。同じエピソードでも企業ごとに刺さる表現に変わります。</span>
                     </div>
                   </div>
                 </div>
@@ -390,7 +440,7 @@ export default function HomePage() {
                       </div>
                     )}
                   </div>
-                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-500"><Building2 className="w-4 h-4 flex-shrink-0" /><span>現在50社の企業データで最適化対応 • 随時追加中！</span></div>
+                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-500"><Building2 className="w-4 h-4 flex-shrink-0" /><span>現在100社の企業データで最適化対応 • 随時追加中！</span></div>
 
                   {selectedCompany?.hasData && (
                     <div className="mt-3 p-3 sm:p-5 rounded-xl border-2 border-emerald-400 bg-gradient-to-br from-emerald-50 to-green-50" style={{ opacity: useOptimization ? 1 : 0.6 }}>
