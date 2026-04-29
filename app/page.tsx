@@ -688,6 +688,23 @@ export default function HomePage() {
                 <div className="flex items-center gap-3"><Crown className="w-8 h-8 text-amber-500 flex-shrink-0" /><div className="flex-1 min-w-0"><div className="font-bold text-sm text-gray-900">プレミアムで添削＆無制限生成</div><div className="text-xs text-gray-500">残り{credits}回 → 月額480円で制限なし</div></div><button onClick={handleUpgrade} className="px-3 sm:px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white text-xs sm:text-sm font-bold whitespace-nowrap shadow-sm">UP</button></div>
               </div>
             )}
+
+            {/* ジール就活エージェント */}
+            <div className="mt-4 p-4 sm:p-5 rounded-xl bg-blue-50 border border-blue-200">
+              <div className="text-[10px] text-gray-400 mb-2">PR</div>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0"><Users className="w-5 h-5 text-white" /></div>
+                <div className="flex-1">
+                  <div className="font-bold text-sm text-gray-900 mb-1">ESの次は面接対策！プロに無料相談</div>
+                  <p className="text-xs text-gray-600 mb-3">ジール就活エージェントなら、ES添削・面接対策・企業紹介まで完全無料。大手内定実績多数のプロがあなたの就活をサポートします。</p>
+                  <a href="https://px.a8.net/svt/ejp?a8mat=45I8XI+EF61TU+52C6+BX3J6" target="_blank" rel="nofollow noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold transition-all">
+                    <ExternalLink className="w-3.5 h-3.5" /> 無料で相談してみる
+                  </a>
+                  <img className="hidden" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=45I8XI+EF61TU+52C6+BX3J6" alt="" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

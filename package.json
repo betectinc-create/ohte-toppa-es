@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.76.0",
+    "@clerk/localizations": "^4.5.5",
     "@clerk/nextjs": "^6.38.0",
     "@stripe/stripe-js": "^8.7.0",
     "@supabase/supabase-js": "^2.97.0",

@@ -1,4 +1,5 @@
 import { ClerkProvider } from '@clerk/nextjs'
+import { jaJP } from '@clerk/localizations'
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -58,7 +59,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider localization={jaJP}>
       <html lang="ja">
         <head>
           {/* Google Analytics */}
