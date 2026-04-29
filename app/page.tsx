@@ -303,6 +303,121 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* 使い方ステップ */}
+          <div className="mb-12">
+            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-6 text-center">かんたん3ステップ</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+              {[
+                { step: '1', title: '企業名を入力', desc: '志望企業を選ぶだけ。100社のデータから自動で求める人物像を取得します。' },
+                { step: '2', title: 'エピソードを入力', desc: '箇条書きでOK。「サークルで50人をまとめた」など、ざっくりした内容で大丈夫。' },
+                { step: '3', title: 'AIが最適化ES生成', desc: '企業の価値観に合わせた構成・表現で、PREP法に基づいたESが完成。' },
+              ].map(({ step, title, desc }, i) => (
+                <div key={i} className="bg-white rounded-2xl p-5 md:p-6 border border-gray-200 shadow-sm text-center">
+                  <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center text-lg font-bold mx-auto mb-3">{step}</div>
+                  <h4 className="font-bold text-gray-900 mb-2">{title}</h4>
+                  <p className="text-sm text-gray-600">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ビフォーアフター */}
+          <div className="mb-12">
+            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-6 text-center">普通のES vs 大手突破ESの違い</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div className="bg-white rounded-2xl p-5 md:p-6 border-2 border-red-200 shadow-sm">
+                <div className="flex items-center gap-2 mb-3"><X className="w-5 h-5 text-red-500" /><span className="font-bold text-red-600 text-sm">よくあるES（不合格になりやすい）</span></div>
+                <div className="text-sm text-gray-600 leading-relaxed bg-red-50 rounded-xl p-4">
+                  私は学生時代、サークル活動に力を入れました。代表として頑張り、メンバーをまとめることができました。この経験から、チームワークの大切さを学びました。貴社でもこの経験を活かして頑張りたいと思います。
+                </div>
+                <div className="mt-3 space-y-1">
+                  <div className="text-xs text-red-500 flex items-center gap-1"><X className="w-3 h-3" />具体的な数字がない</div>
+                  <div className="text-xs text-red-500 flex items-center gap-1"><X className="w-3 h-3" />企業の求める人物像に合ってない</div>
+                  <div className="text-xs text-red-500 flex items-center gap-1"><X className="w-3 h-3" />「頑張った」だけで中身が薄い</div>
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl p-5 md:p-6 border-2 border-emerald-400 shadow-sm">
+                <div className="flex items-center gap-2 mb-3"><CheckCircle className="w-5 h-5 text-emerald-500" /><span className="font-bold text-emerald-600 text-sm">大手突破ES（三菱商事向けに最適化）</span></div>
+                <div className="text-sm text-gray-600 leading-relaxed bg-emerald-50 rounded-xl p-4">
+                  50名のサークルで代表を務め、コロナ禍で活動停止の危機に直面した。対面活動の代替としてオンラインイベントを企画し、参加率を30%から80%へ改善した。この経験で培った<strong className="text-emerald-700">構想力</strong>と<strong className="text-emerald-700">実行力</strong>を、貴社の新規事業開発で発揮したい。
+                </div>
+                <div className="mt-3 space-y-1">
+                  <div className="text-xs text-emerald-600 flex items-center gap-1"><CheckCircle className="w-3 h-3" />具体的な数字（50名、30%→80%）</div>
+                  <div className="text-xs text-emerald-600 flex items-center gap-1"><CheckCircle className="w-3 h-3" />三菱商事の「構想力・実行力」に寄せた表現</div>
+                  <div className="text-xs text-emerald-600 flex items-center gap-1"><CheckCircle className="w-3 h-3" />PREP法で構成が明確</div>
+                </div>
+              </div>
+            </div>
+            <p className="text-center text-xs text-gray-400 mt-3">※ 生成例はイメージです。実際の生成結果は入力内容により異なります。</p>
+          </div>
+
+          {/* 生成例 */}
+          <div className="mb-12">
+            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-6 text-center">同じエピソードでも、企業ごとに変わる</h3>
+            <div className="space-y-4">
+              <div className="bg-white rounded-2xl p-5 md:p-6 border border-gray-200 shadow-sm">
+                <div className="text-xs text-gray-500 mb-2">入力エピソード（共通）</div>
+                <div className="text-sm text-gray-700 bg-gray-50 rounded-xl p-4">サークル代表として50人をまとめた。コロナで活動中止の危機。オンラインに切り替え、参加率を80%に改善。</div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-2xl p-5 border border-emerald-200 shadow-sm">
+                  <div className="flex items-center gap-2 mb-2"><Star className="w-4 h-4 text-amber-500" /><span className="font-bold text-sm text-gray-900">三菱商事向け</span></div>
+                  <div className="text-xs text-emerald-600 mb-2">→「構想力」「実行力」を強調</div>
+                  <div className="text-sm text-gray-600 bg-emerald-50 rounded-lg p-3 leading-relaxed">危機に対して代替策を<strong>構想</strong>し、オンライン化を<strong>実行</strong>した経験から、未知の課題にも解決策を描き実現する力を培いました...</div>
+                </div>
+                <div className="bg-white rounded-2xl p-5 border border-emerald-200 shadow-sm">
+                  <div className="flex items-center gap-2 mb-2"><Star className="w-4 h-4 text-amber-500" /><span className="font-bold text-sm text-gray-900">ソニー向け</span></div>
+                  <div className="text-xs text-emerald-600 mb-2">→「クリエイティビティ」を強調</div>
+                  <div className="text-sm text-gray-600 bg-emerald-50 rounded-lg p-3 leading-relaxed">従来の対面活動を前提とせず、<strong>ゼロベースで新しい体験</strong>を設計しました。参加者のニーズを分析し、<strong>創造的な</strong>オンラインイベントを実現...</div>
+                </div>
+              </div>
+            </div>
+            <p className="text-center text-xs text-gray-400 mt-3">※ 生成例はイメージです。実際の生成結果は入力内容により異なります。</p>
+          </div>
+
+          {/* 利用者の声 */}
+          <div className="mb-12">
+            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-6 text-center">利用者の声</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+              {[
+                { name: 'K.Sさん', univ: '早稲田大学 3年', text: '企業ごとに書き分けるのが本当に大変だったけど、企業名入れるだけで最適化してくれるのが神。5社分を1日で作れた。' },
+                { name: 'M.Tさん', univ: '大阪大学 3年', text: 'ESの書き方が全然わからなくて困ってたけど、エピソードを箇条書きで入れるだけでちゃんとした文章になった。添削機能も便利。' },
+                { name: 'R.Hさん', univ: '慶應義塾大学 4年', text: '商社志望で5大商社全部のESを最適化して作った。面接でも「ESの内容が的確」と言われた。' },
+              ].map(({ name, univ, text }, i) => (
+                <div key={i} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                  <div className="flex items-center gap-1 mb-3">{[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 text-amber-400 fill-amber-400" />)}</div>
+                  <p className="text-sm text-gray-700 mb-4 leading-relaxed">「{text}」</p>
+                  <div className="text-xs text-gray-500"><span className="font-semibold text-gray-700">{name}</span> ・ {univ}</div>
+                </div>
+              ))}
+            </div>
+            <p className="text-center text-xs text-gray-400 mt-3">※ 利用者の声は使用感をもとに再構成したものです。</p>
+          </div>
+
+          {/* FAQ */}
+          <div className="mb-12">
+            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-6 text-center">よくある質問</h3>
+            <div className="space-y-3">
+              {[
+                { q: '本当に無料で使えますか？', a: 'はい、アカウント登録後5回まで完全無料でES生成ができます。クレジットカードの登録も不要です。' },
+                { q: 'AIで作ったESだとバレませんか？', a: 'あなたのエピソードをもとに生成するため、一人ひとり異なる文章になります。また、AI特有の表現を避ける設計になっています。ただし、生成後にご自身の言葉で微調整することをおすすめします。' },
+                { q: 'どんな企業に対応していますか？', a: '三菱商事、トヨタ、ソニーなど大手100社のデータを搭載しています。リストにない企業でも、求める人物像を手動で入力すれば最適化が可能です。' },
+                { q: 'プレミアムプランの解約はいつでもできますか？', a: 'はい、いつでもワンクリックで解約できます。解約後も契約期間末日までご利用いただけます。' },
+                { q: '志望動機やガクチカも作れますか？', a: 'はい、ES（自己PR）だけでなく、志望動機・ガクチカ（学生時代に力を入れたこと）にも対応しています。' },
+              ].map(({ q, a }, i) => (
+                <div key={i} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">Q</span>
+                    <div className="flex-1">
+                      <div className="font-bold text-sm text-gray-900 mb-2">{q}</div>
+                      <div className="text-sm text-gray-600 leading-relaxed">{a}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* 料金プラン */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-12">
             <div className="bg-white rounded-2xl p-6 md:p-8 border-2 border-gray-200 shadow-sm">
