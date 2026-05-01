@@ -9,15 +9,15 @@ export async function POST(req: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 });
     }
-    const customers = await stripe.customers.list({ limit: 100 });
-    const customer = customers.data.find(
-      (c) => c.metadata?.userId === userId || c.metadata?.user_id === userId
+    const allCustomers = await stripe.customers.list({ limit: 100 });
+    const matched = allCustomers['data'].find(
+      (c) => c['metadata']?.userId === userId || c['metadata']?.user_id === userId
     );
-    if (!customer) {
+    if (!matched) {
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
     }
     const portalSession = await stripe.billingPortal.sessions.create({
-      customer: customer.id,
+      customer: matched['id'],
       return_url: 'https://www.ohte-toppa-es.com',
     });
     return NextResponse.json({ url: portalSession.url });
