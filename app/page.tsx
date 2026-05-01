@@ -195,6 +195,15 @@ export default function HomePage() {
     } catch (error) { console.error('Error:', error); alert('アップグレードに失敗しました'); }
   };
 
+  const handleManageSubscription = async () => {
+    if (!user) return;
+    try {
+      const response = await fetch('/api/billing-portal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id }) });
+      const { url } = await response.json();
+      if (url) window.location.href = url;
+    } catch (error) { console.error('Error:', error); alert('プラン管理ページを開けませんでした'); }
+  };
+
   const wordCounts = Array.from({ length: 15 }, (_, i) => 100 + i * 50);
 
   const handleGenerationTypeChange = (type: GenerationType) => {
@@ -655,6 +664,7 @@ export default function HomePage() {
               {isPremium && (<div className="mb-4 px-3 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-yellow-500 text-center shadow-sm"><span className="text-sm font-bold text-white flex items-center justify-center gap-1.5"><Crown className="w-4 h-4" /> ご利用中</span></div>)}
               <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">{['生成 無制限', '複数パターン生成', '詳細添削'].map((f, i) => (<li key={i} className="flex items-center gap-2 text-xs sm:text-sm text-gray-600"><CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 flex-shrink-0" /><span>{f}</span></li>))}</ul>
               {!isPremium && (<><div className="text-center mb-3 sm:mb-4"><div className="text-2xl sm:text-3xl font-bold text-gray-900">¥480</div><div className="text-xs sm:text-sm text-gray-500">/月</div></div><button onClick={handleUpgrade} className="w-full py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white shadow-sm">今すぐアップグレード</button></>)}
+              {isPremium && (<button onClick={handleManageSubscription} className="w-full py-2 rounded-lg text-xs sm:text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all">プラン管理・解約</button>)}
             </div>
           </div>
         </div>
