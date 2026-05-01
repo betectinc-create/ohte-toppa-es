@@ -1,5 +1,4 @@
-python3 -c "
-content = '''import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -27,8 +26,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to create portal session' }, { status: 500 });
   }
 }
-'''
-with open('app/api/billing-portal/route.ts', 'w') as f:
-    f.write(content)
-print('Done')
-"
