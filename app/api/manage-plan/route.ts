@@ -73,16 +73,67 @@ export async function POST(req: NextRequest) {
 
     const origin =
       req.headers.get('origin') ?? 'https://www.ohte-toppa-es.com';
-    const portalSession = await stripe.billingPortal.sessions.create({
-      customer: customerId,
-      return_url: origin,
-    });
 
-    return NextResponse.json({ url: portalSession.url });
-  } catch (error) {
-    console.error('manage-plan error:', error);
+    const createPortalSession = (configuration?: string) =>
+      stripe.billingPortal.sessions.create({
+        customer: customerId!,
+        return_url: origin,
+        ...(configuration ? { configuration } : {}),
+      });
+
+    try {
+      const portalSession = await createPortalSession();
+      return NextResponse.json({ url: portalSession.url });
+    } catch (e: unknown) {
+      const err = e as Stripe.errors.StripeError;
+      const noConfig =
+        err?.code === 'billing_portal_configuration_invalid' ||
+        /default configuration has not been created|No configuration provided/i.test(
+          err?.message ?? ''
+        );
+      if (!noConfig) throw e;
+
+      const config = await stripe.billingPortal.configurations.create({
+        business_profile: {
+          headline: 'プラン管理・解約',
+        },
+        features: {
+          customer_update: {
+            enabled: true,
+            allowed_updates: ['email', 'name'],
+          },
+          invoice_history: { enabled: true },
+          payment_method_update: { enabled: true },
+          subscription_cancel: {
+            enabled: true,
+            mode: 'at_period_end',
+            cancellation_reason: {
+              enabled: true,
+              options: [
+                'too_expensive',
+                'missing_features',
+                'switched_service',
+                'unused',
+                'other',
+              ],
+            },
+          },
+        },
+        default_return_url: origin,
+      });
+      const portalSession = await createPortalSession(config.id);
+      return NextResponse.json({ url: portalSession.url });
+    }
+  } catch (error: unknown) {
+    const err = error as { message?: string; code?: string; type?: string; raw?: { message?: string } };
+    console.error('manage-plan error:', err);
     return NextResponse.json(
-      { error: 'Failed to create portal session' },
+      {
+        error: 'Failed to create portal session',
+        message: err?.message ?? String(error),
+        code: err?.code,
+        type: err?.type,
+      },
       { status: 500 }
     );
   }
