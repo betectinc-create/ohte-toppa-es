@@ -198,7 +198,7 @@ export default function HomePage() {
   const handleManageSubscription = async () => {
     if (!user) return;
     try {
-      const response = await fetch('/api/billing-portal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id }) });
+      const response = await fetch('/api/manage-plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id }) });
       const { url } = await response.json();
       if (url) window.location.href = url;
     } catch (error) { console.error('Error:', error); alert('プラン管理ページを開けませんでした'); }
