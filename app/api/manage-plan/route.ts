@@ -24,7 +24,14 @@ export async function POST(req: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    let customerId: string | undefined;
+    const candidates: string[] = [];
+    const seen = new Set<string>();
+    const push = (id?: string | null) => {
+      if (id && !seen.has(id)) {
+        seen.add(id);
+        candidates.push(id);
+      }
+    };
 
     const { data: sub, error: subErr } = await supabase
       .from('subscriptions')
@@ -35,36 +42,42 @@ export async function POST(req: NextRequest) {
       .limit(1)
       .maybeSingle();
     if (subErr) console.error('manage-plan supabase err:', subErr);
-    customerId = sub?.stripe_customer_id ?? undefined;
+    push(sub?.stripe_customer_id ?? null);
 
-    if (!customerId) {
+    let email: string | undefined;
+    try {
+      const cc = await clerkClient();
+      const u = await cc.users.getUser(userId);
+      email =
+        u.primaryEmailAddress?.emailAddress ??
+        u.emailAddresses?.[0]?.emailAddress;
+    } catch (e) {
+      console.error('manage-plan clerk lookup err:', e);
+    }
+
+    if (email) {
       try {
-        const cc = await clerkClient();
-        const u = await cc.users.getUser(userId);
-        const email =
-          u.primaryEmailAddress?.emailAddress ??
-          u.emailAddresses?.[0]?.emailAddress;
-        if (email) {
-          const list = await stripe.customers.list({ email, limit: 10 });
-          if (list.data.length > 0) {
-            const sorted = [...list.data].sort((a, b) => b.created - a.created);
-            customerId = sorted[0].id;
-          }
-        }
+        const list = await stripe.customers.list({ email, limit: 10 });
+        const sorted = [...list.data].sort((a, b) => b.created - a.created);
+        for (const c of sorted) push(c.id);
       } catch (e) {
-        console.error('manage-plan clerk/email lookup err:', e);
+        console.error('manage-plan stripe email lookup err:', e);
       }
     }
 
-    if (!customerId) {
-      const list = await stripe.customers.list({ limit: 100 });
-      const matched = list.data.find(
-        (c) => c.metadata?.userId === userId || c.metadata?.user_id === userId
-      );
-      customerId = matched?.id;
+    if (candidates.length === 0) {
+      try {
+        const list = await stripe.customers.list({ limit: 100 });
+        const matched = list.data.find(
+          (c) => c.metadata?.userId === userId || c.metadata?.user_id === userId
+        );
+        push(matched?.id ?? null);
+      } catch (e) {
+        console.error('manage-plan stripe metadata lookup err:', e);
+      }
     }
 
-    if (!customerId) {
+    if (candidates.length === 0) {
       return NextResponse.json(
         { error: 'Customer not found', userId },
         { status: 404 }
@@ -74,29 +87,11 @@ export async function POST(req: NextRequest) {
     const origin =
       req.headers.get('origin') ?? 'https://www.ohte-toppa-es.com';
 
-    const createPortalSession = (configuration?: string) =>
-      stripe.billingPortal.sessions.create({
-        customer: customerId!,
-        return_url: origin,
-        ...(configuration ? { configuration } : {}),
-      });
-
-    try {
-      const portalSession = await createPortalSession();
-      return NextResponse.json({ url: portalSession.url });
-    } catch (e: unknown) {
-      const err = e as Stripe.errors.StripeError;
-      const noConfig =
-        err?.code === 'billing_portal_configuration_invalid' ||
-        /default configuration has not been created|No configuration provided/i.test(
-          err?.message ?? ''
-        );
-      if (!noConfig) throw e;
-
+    let configurationId: string | undefined;
+    const ensureConfig = async () => {
+      if (configurationId) return configurationId;
       const config = await stripe.billingPortal.configurations.create({
-        business_profile: {
-          headline: 'プラン管理・解約',
-        },
+        business_profile: { headline: 'プラン管理・解約' },
         features: {
           customer_update: {
             enabled: true,
@@ -121,11 +116,80 @@ export async function POST(req: NextRequest) {
         },
         default_return_url: origin,
       });
-      const portalSession = await createPortalSession(config.id);
-      return NextResponse.json({ url: portalSession.url });
+      configurationId = config.id;
+      return configurationId;
+    };
+
+    const tryCreate = async (customerId: string) => {
+      try {
+        return await stripe.billingPortal.sessions.create({
+          customer: customerId,
+          return_url: origin,
+          ...(configurationId ? { configuration: configurationId } : {}),
+        });
+      } catch (e: unknown) {
+        const err = e as Stripe.errors.StripeError;
+        const noConfig =
+          err?.code === 'billing_portal_configuration_invalid' ||
+          /default configuration has not been created|No configuration provided/i.test(
+            err?.message ?? ''
+          );
+        if (noConfig) {
+          const cfgId = await ensureConfig();
+          return await stripe.billingPortal.sessions.create({
+            customer: customerId,
+            return_url: origin,
+            configuration: cfgId,
+          });
+        }
+        throw e;
+      }
+    };
+
+    let lastErr: unknown;
+    let usedCustomerId: string | undefined;
+    let portalUrl: string | undefined;
+    for (const customerId of candidates) {
+      try {
+        const portalSession = await tryCreate(customerId);
+        usedCustomerId = customerId;
+        portalUrl = portalSession.url;
+        break;
+      } catch (e: unknown) {
+        const err = e as Stripe.errors.StripeError;
+        lastErr = e;
+        if (err?.code === 'resource_missing') {
+          console.warn(
+            `manage-plan: stale customer ${customerId} (resource_missing), trying next`
+          );
+          continue;
+        }
+        throw e;
+      }
     }
+
+    if (!portalUrl || !usedCustomerId) {
+      throw lastErr ?? new Error('No usable Stripe customer for this user');
+    }
+
+    if (sub?.stripe_customer_id && sub.stripe_customer_id !== usedCustomerId) {
+      const { error: updErr } = await supabase
+        .from('subscriptions')
+        .update({ stripe_customer_id: usedCustomerId })
+        .eq('user_id', userId)
+        .eq('stripe_customer_id', sub.stripe_customer_id);
+      if (updErr) {
+        console.error('manage-plan supabase update err:', updErr);
+      }
+    }
+
+    return NextResponse.json({ url: portalUrl });
   } catch (error: unknown) {
-    const err = error as { message?: string; code?: string; type?: string; raw?: { message?: string } };
+    const err = error as {
+      message?: string;
+      code?: string;
+      type?: string;
+    };
     console.error('manage-plan error:', err);
     return NextResponse.json(
       {
