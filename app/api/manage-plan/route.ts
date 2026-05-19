@@ -6,19 +6,39 @@ import { auth, clerkClient } from '@clerk/nextjs/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+const log = (...args: unknown[]) => console.log('[manage-plan]', ...args);
+const warn = (...args: unknown[]) => console.warn('[manage-plan]', ...args);
+const errLog = (...args: unknown[]) => console.error('[manage-plan]', ...args);
+
 export async function POST(req: NextRequest) {
+  const triedCustomers: { id: string; result: string }[] = [];
+  let candidatesDebug: string[] = [];
+
   try {
+    log('==> request received');
+
     const body = await req.json().catch(() => ({} as { userId?: string }));
     const { userId: authedUserId } = await auth();
     const userId = authedUserId ?? body.userId;
+    log('userId resolved:', { authed: !!authedUserId, fromBody: !!body.userId, userId });
 
     if (!userId) {
       return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
     }
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      errLog('STRIPE_SECRET_KEY missing');
+      return NextResponse.json(
+        { error: 'Failed to create portal session', message: 'STRIPE_SECRET_KEY env missing' },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2026-01-28.clover',
     });
+    log('stripe mode:', process.env.STRIPE_SECRET_KEY.startsWith('sk_live_') ? 'live' : 'test');
+
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -26,10 +46,11 @@ export async function POST(req: NextRequest) {
 
     const candidates: string[] = [];
     const seen = new Set<string>();
-    const push = (id?: string | null) => {
+    const push = (id: string | null | undefined, source: string) => {
       if (id && !seen.has(id)) {
         seen.add(id);
         candidates.push(id);
+        log(`candidate added from ${source}:`, id);
       }
     };
 
@@ -41,8 +62,9 @@ export async function POST(req: NextRequest) {
       .order('current_period_end', { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (subErr) console.error('manage-plan supabase err:', subErr);
-    push(sub?.stripe_customer_id ?? null);
+    if (subErr) errLog('supabase err:', subErr);
+    log('supabase sub row:', sub);
+    push(sub?.stripe_customer_id ?? null, 'supabase');
 
     let email: string | undefined;
     try {
@@ -51,17 +73,19 @@ export async function POST(req: NextRequest) {
       email =
         u.primaryEmailAddress?.emailAddress ??
         u.emailAddresses?.[0]?.emailAddress;
+      log('clerk email:', email);
     } catch (e) {
-      console.error('manage-plan clerk lookup err:', e);
+      errLog('clerk lookup err:', e);
     }
 
     if (email) {
       try {
         const list = await stripe.customers.list({ email, limit: 10 });
+        log('stripe customers by email:', list.data.map((c) => ({ id: c.id, created: c.created })));
         const sorted = [...list.data].sort((a, b) => b.created - a.created);
-        for (const c of sorted) push(c.id);
+        for (const c of sorted) push(c.id, 'stripe-email');
       } catch (e) {
-        console.error('manage-plan stripe email lookup err:', e);
+        errLog('stripe email lookup err:', e);
       }
     }
 
@@ -71,11 +95,14 @@ export async function POST(req: NextRequest) {
         const matched = list.data.find(
           (c) => c.metadata?.userId === userId || c.metadata?.user_id === userId
         );
-        push(matched?.id ?? null);
+        push(matched?.id ?? null, 'stripe-metadata');
       } catch (e) {
-        console.error('manage-plan stripe metadata lookup err:', e);
+        errLog('stripe metadata lookup err:', e);
       }
     }
+
+    candidatesDebug = [...candidates];
+    log('final candidates:', candidatesDebug);
 
     if (candidates.length === 0) {
       return NextResponse.json(
@@ -90,6 +117,7 @@ export async function POST(req: NextRequest) {
     let configurationId: string | undefined;
     const ensureConfig = async () => {
       if (configurationId) return configurationId;
+      log('creating billing portal configuration');
       const config = await stripe.billingPortal.configurations.create({
         business_profile: { headline: 'プラン管理・解約' },
         features: {
@@ -117,6 +145,7 @@ export async function POST(req: NextRequest) {
         default_return_url: origin,
       });
       configurationId = config.id;
+      log('created configuration:', configurationId);
       return configurationId;
     };
 
@@ -135,6 +164,7 @@ export async function POST(req: NextRequest) {
             err?.message ?? ''
           );
         if (noConfig) {
+          warn('no portal config, creating one and retrying');
           const cfgId = await ensureConfig();
           return await stripe.billingPortal.sessions.create({
             customer: customerId,
@@ -151,19 +181,25 @@ export async function POST(req: NextRequest) {
     let portalUrl: string | undefined;
     for (const customerId of candidates) {
       try {
+        log('trying customer:', customerId);
         const portalSession = await tryCreate(customerId);
         usedCustomerId = customerId;
         portalUrl = portalSession.url;
+        triedCustomers.push({ id: customerId, result: 'ok' });
+        log('portal session OK:', portalUrl);
         break;
       } catch (e: unknown) {
         const err = e as Stripe.errors.StripeError;
         lastErr = e;
+        triedCustomers.push({
+          id: customerId,
+          result: `${err?.code ?? err?.type ?? 'error'}: ${err?.message ?? String(e)}`,
+        });
         if (err?.code === 'resource_missing') {
-          console.warn(
-            `manage-plan: stale customer ${customerId} (resource_missing), trying next`
-          );
+          warn(`stale customer ${customerId} (resource_missing), trying next`);
           continue;
         }
+        errLog(`customer ${customerId} failed (non-retryable):`, err);
         throw e;
       }
     }
@@ -173,14 +209,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (sub?.stripe_customer_id && sub.stripe_customer_id !== usedCustomerId) {
+      log('self-heal supabase row:', sub.stripe_customer_id, '->', usedCustomerId);
       const { error: updErr } = await supabase
         .from('subscriptions')
         .update({ stripe_customer_id: usedCustomerId })
         .eq('user_id', userId)
         .eq('stripe_customer_id', sub.stripe_customer_id);
-      if (updErr) {
-        console.error('manage-plan supabase update err:', updErr);
-      }
+      if (updErr) errLog('supabase update err:', updErr);
     }
 
     return NextResponse.json({ url: portalUrl });
@@ -189,14 +224,23 @@ export async function POST(req: NextRequest) {
       message?: string;
       code?: string;
       type?: string;
+      raw?: { message?: string };
     };
-    console.error('manage-plan error:', err);
+    errLog('FAILED:', {
+      message: err?.message,
+      code: err?.code,
+      type: err?.type,
+      raw: err?.raw,
+      triedCustomers,
+      candidatesDebug,
+    });
     return NextResponse.json(
       {
         error: 'Failed to create portal session',
         message: err?.message ?? String(error),
         code: err?.code,
         type: err?.type,
+        triedCustomers,
       },
       { status: 500 }
     );
