@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/cron/ping-supabase",
-      "schedule": "0 3 * * *"
-    }
-  ]
-}
